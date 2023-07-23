@@ -1,16 +1,24 @@
-print('Starting...')
-import os, time
-from pyrogram import filters, Client
-from pyrogram.raw import functions
-from pyrogram.types import Message
-from pyrogram.errors import FloodWait
-import integrate as grate
-import concurrent.futures
-from config import api_id, api_hash, v, heart1, georg, heart2, ghoul
+from    config          import  text
+from    datetime        import  datetime
+startTime = datetime.now()
+from    rich            import  print
+from    rich.console    import  Console
+from    rich.traceback  import  install
+install()
+print(text)
+import  os, time, concurrent.futures, platform
+import  random          as      r
+from    threading       import  Event
+from    pyrogram        import  filters, Client
+from    pyrogram.raw    import  functions
+from    pyrogram.types  import  Message
+from    pyrogram.errors import  FloodWait
+import  integrate       as      grate
+from    config          import  api_id, api_hash, v, heart1, georg, heart2, ghoul
+from    subprocess      import  Popen
 
 def clear():
     os.system('cls')
-print('Starting...')
 clear()
 lng = input('Choose your language\n1: English\n2: Русский\nLanguage: ')
 languages = ['en','ru']
@@ -19,13 +27,12 @@ if lng == "1":
     lang = en
 elif lng == "2":
     lang = ru
-
 def ln(id):
     return(lang[id])
+
 clear()
 print(ln(0))
 print(ln(5))
-time.sleep(0.5)
 accs = ['new',]
 clear()
 print(ln(1))
@@ -43,8 +50,6 @@ user = accs[int(inp)]
 clear()
 print(f'{ln(3)} {user}...')
 clear()
-print(f'{ln(17)} {user}')
-time.sleep(0.5)
 if user == 'new':
     user = input(ln(4))
     print(ln(5))
@@ -66,8 +71,10 @@ cur.execute('''CREATE TABLE IF NOT EXISTS messages(
              name INTEGER NOT NULL,
              message INTEGER NOT NULL);''')
 clear()
-desc = input(f'[BETA] {ln(23)[0]}\n1 - Yes\n0 - No\n')
-if desc == '1':
+chints = input(f'{ln(23)[0]}\n1 - Yes\n0 - No\n')
+clear()
+beta = input(ln(25)[0])
+if chints == '1':
     cur.execute('''CREATE TABLE IF NOT EXISTS profile(
              id INTEGER PRIMARY KEY AUTOINCREMENT,
              val TEXT NOT NULL,
@@ -80,17 +87,43 @@ if desc == '1':
     result = cur.fetchone()
     if result[0] == 0:
         cur.execute("INSERT INTO settings (key, val) VALUES (?, ?)", ('name_interval', '60'))
-    cur.execute("SELECT EXISTS(SELECT 1 FROM settings WHERE key='desc_interval' LIMIT 1)")
+    cur.execute("SELECT EXISTS(SELECT 1 FROM settings WHERE key='chints_interval' LIMIT 1)")
     result = cur.fetchone()
     if result[0] == 0:
-        cur.execute("INSERT INTO settings (key, val) VALUES (?, ?)", ('desc_interval', '60'))
+        cur.execute("INSERT INTO settings (key, val) VALUES (?, ?)", ('chints_interval', '60'))
+    conn.commit()
+
+if beta == '1':
+    cur.execute('''CREATE TABLE IF NOT EXISTS variables(
+             key TEXT NOT NULL,
+             val TEXT NOT NULL)''')
+    cur.execute("SELECT EXISTS(SELECT 1 FROM variables WHERE key='white' LIMIT 1)")
+    result = cur.fetchone()[0]
+    if result == 0:
+        cur.execute("INSERT INTO variables (key, val) VALUES (?, ?)", ('white', '🤍'))
+
+    cur.execute("SELECT EXISTS(SELECT 1 FROM variables WHERE key='blue' LIMIT 1)")
+    result = cur.fetchone()[0]
+    if result == 0:
+        cur.execute("INSERT INTO variables (key, val) VALUES (?, ?)", ('blue', '💙'))
+
+    cur.execute("SELECT EXISTS(SELECT 1 FROM variables WHERE key='red' LIMIT 1)")
+    result = cur.fetchone()[0]
+    if result == 0:
+        cur.execute("INSERT INTO variables (key, val) VALUES (?, ?)", ('red', '❤'))
+    
+    cur.execute("SELECT EXISTS(SELECT 1 FROM variables WHERE key='green' LIMIT 1)")
+    result = cur.fetchone()[0]
+    if result == 0:
+        cur.execute("INSERT INTO variables (key, val) VALUES (?, ?)", ('green', '💚'))
     conn.commit()
 
 client = Client(user, api_id, api_hash, (f"Bot v.{v} | {languages[int(lng)-1]}"), (f"Telehash on {name}'s device"))
-
+print(f'{ln(17)} {user}')
+runTime = datetime.now()
 
 @client.on_message(filters.command("type", prefixes='!') & filters.me)
-def type(client_object, message: Message):
+def type(client, message: Message):
     input_text = message.text.split("!type ", maxsplit=1)[1]
     temp_text = input_text
     edited_text = ""
@@ -108,7 +141,7 @@ def type(client_object, message: Message):
             pass
 
 @client.on_message(filters.command("heart", prefixes='!') & filters.me)
-def hearts(client_object, message: Message):
+def hearts(client, message: Message):
     print('\n')
     try:
         if message.text.split(' ')[1] == '1':
@@ -124,7 +157,7 @@ def hearts(client_object, message: Message):
     print(ln(8) + '                                            ')
 
 @client.on_message(filters.command('rib', prefixes='!') & filters.me)
-def rib(client_object, message: Message):
+def rib(client, message: Message):
     print('\n')
     message.edit(ln(10))
     for o in range(4):
@@ -139,16 +172,16 @@ def rib(client_object, message: Message):
     print(ln(8) + '                                            ')
 
 @client.on_message(filters.command("au", prefixes='!'))
-def au(clients_object, message: Message):
+def au(client, message: Message):
     try:
         message.edit(f'{ln(7)} {message.from_user.first_name}')
         client.join_chat('@telehashdev')
     except:
-        message.reply(f'{ln(7)} {message.from_user.first_name}')
+        message.reply(f'{ln(7)}')
         client.join_chat('@telehashdev')
 
 @client.on_message(filters.command('spoti', prefixes='!') & filters.me)
-def spot(clients_object, message: Message):
+def spot(client, message: Message):
     try:
         author, song = grate.spotify()[1], grate.spotify()[2]
         message.edit(f'{ln(11)[0]}\n{ln(11)[1]}{author}\n{ln(11)[2]}{song}')
@@ -156,13 +189,13 @@ def spot(clients_object, message: Message):
         pass
 
 @client.on_message(filters.command('.', prefixes='.') & filters.me)
-def tochka(client_object, message: Message):
+def tochka(client, message: Message):
     message.delete()
     client.send_message(message.chat.id, (f'{ln(13)}{message.reply_to_message.from_user.first_name}'))
     client.copy_message(message.chat.id, message.chat.id, message.reply_to_message.id)
 
 @client.on_message(filters.command('roll', '!') & filters.me)
-def roll(client_object, message: Message):
+def roll(client, message: Message):
     try:
         frm = message.text.split(' ')[1]
         to = message.text.split(' ')[2]
@@ -171,7 +204,7 @@ def roll(client_object, message: Message):
         message.edit('attributes missing')
 
 @client.on_message(filters.command('try', '!') & filters.me)
-def trry(client_object, message: Message):
+def trry(client, message: Message):
     try:
         right = message.text.split(' ', 1)[1]
         message.edit(f'{right.capitalize()}: **{ln(16)[grate.trry()]}**')
@@ -179,10 +212,9 @@ def trry(client_object, message: Message):
         message.edit('attributes missing')
 
 @client.on_message(filters.command('add', '!') & filters.me)
-def addtext(client_object, message: Message):
+def addtext(client, message: Message):
     namex = message.text.split() # namex[1]
     textx = message.reply_to_message.text
-    print(f'!add received with name "{namex[1]}", saving with text "{textx}"...')
     try:
         cur.execute("INSERT INTO messages (name, message) VALUES (?, ?)", (namex[1], textx))
         conn.commit()
@@ -195,7 +227,7 @@ def addtext(client_object, message: Message):
         message.delete()
 
 @client.on_message(filters.command('del', '!') & filters.me)
-def deltext(client_object, message: Message):
+def deltext(client, message: Message):
     id = message.text.split()[1]
     try:
         typ = message.text.split()[2]
@@ -269,8 +301,8 @@ def ghoul_activate(client, message: Message):
 
 @client.on_message(filters.command('name', '!') & filters.me)
 def name_r(client, message:Message):
-    if desc == '1':
-        sp = message.text.split()
+    if chints == '1':
+        sp = message.text.split(maxsplit=2)
         if sp[1] == 'list':
             cur.execute("SELECT id, val FROM profile WHERE type=?", ('name',))
             rows = cur.fetchall()
@@ -301,20 +333,27 @@ def name_r(client, message:Message):
                 time.sleep(2)
                 message.delete()
         elif sp[1] == 'int':
-            cur.execute('REPLACE INTO settings (key, val) VALUES (?, ?)', ('name_interval', sp[2]))
-            conn.commit()
-    elif desc == '0':
+            try:
+                cur.execute("UPDATE settings SET val=? WHERE key=?", (sp[2], 'name_interval'))
+                conn.commit()
+                message.edit(ln(19)[0])
+                time.sleep(2)
+                message.delete()
+            except:
+                message.edit(ln(19)[1])
+                time.sleep(2)
+                message.delete()
+    elif chints == '0':
         message.edit('BETA not enabled')
         time.sleep(2)
         message.delete()
-            
 
-@client.on_message(filters.command('desc', '!') & filters.me)
-def desc_r(client, message:Message):
-    if desc == '1':
-        sp = message.text.split()
+@client.on_message(filters.command('chints', '!') & filters.me)
+def chints_r(client, message:Message):
+    if chints == '1':
+        sp = message.text.split(maxsplit=2)
         if sp[1] == 'list':
-            cur.execute("SELECT id, val FROM profile WHERE type=?", ('desc',))
+            cur.execute("SELECT id, val FROM profile WHERE type=?", ('chints',))
             rows = cur.fetchall()
             all = ln(20)
             for row in rows:
@@ -322,7 +361,7 @@ def desc_r(client, message:Message):
             message.edit(all)
         elif sp[1] == 'add':
             try:
-                cur.execute('INSERT INTO profile (val, type) VALUES (?, ?)', (sp[2], 'desc'))
+                cur.execute('INSERT INTO profile (val, type) VALUES (?, ?)', (sp[2], 'chints'))
                 conn.commit()
                 message.edit(ln(19)[0])
                 time.sleep(2)
@@ -343,9 +382,17 @@ def desc_r(client, message:Message):
                 time.sleep(2)
                 message.delete()
         elif sp[1] == 'int':
-            cur.execute('REPLACE INTO settings (key, val) VALUES (?, ?)', ('desc_interval', sp[2]))
-            conn.commit()
-    elif desc == '0':
+            try:
+                cur.execute("UPDATE settings SET val=? WHERE key=?", (sp[2], 'chints_interval'))
+                conn.commit()
+                message.edit(ln(19)[0])
+                time.sleep(2)
+                message.delete()
+            except:
+                message.edit(ln(19)[1])
+                time.sleep(2)
+                message.delete()
+    elif chints == '0':
         message.edit('BETA not enabled')
         time.sleep(2)
         message.delete()
@@ -369,30 +416,178 @@ def ghoul2(client, message: Message):
         time.sleep(0.6)
         sm.edit_text(ghoul[i])
 
-@client.on_message(filters.command('init', '!') & filters.me)
+event = Event()
+@client.on_message(filters.command('init', '!!') & filters.me)
 def inithere(client, message:Message):
     cur.execute('SELECT val FROM profile WHERE type=?', ('name',))
     names = cur.fetchall()
-    print(names)
-    #while True:
+    cur.execute('SELECT val FROM profile WHERE type=?', ('chints',))
+    chintss = cur.fetchall()
+    cur.execute('SELECT val FROM settings WHERE key=?', ('name_interval',))
+    nameint = cur.fetchone()[0]
+    cur.execute('SELECT val FROM settings WHERE key=?', ('chints_interval',))
+    chintsint = cur.fetchone()[0]
+    if names == [] or chintss == []:
+        message.edit(ln(24)[1])
+        time.sleep(3)
+        message.delete()
+    else:
+        try:
+            message.edit(f'{ln(24)[0]}⏱ intervals: {nameint} / {chintsint}')
+            time.sleep(3)
+            message.delete()
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                executor.submit(namechint, names, nameint, event)
+                executor.submit(chintschint, chintss, nameint, event)
+        except:
+            message.edit(ln(24)[2])
+            time.sleep(3)
+            message.delete()
 
+def namechint(names, intr, event):
+    while True:
+        randd = r.choice(names)[0]
+        client.update_profile(first_name=randd)
+        time.sleep(int(intr))
+        if event.is_set():
+            print('stopped')
+            return
 
-#@client.on_message()
-#def all(client_object, message: Message):
-#    print(f'{message.from_user.first_name}: {message.text}')
+def chintschint(chintss, intr, event):
+    time.sleep(2)
+    while True:
+        randd = r.choice(chintss)[0]
+        client.update_profile(bio=randd)
+        time.sleep(int(intr))
+        if event.is_set():
+            print('stopped')
+            event.clear()
+            return
+
+@client.on_message(filters.command('stop', '!!') & filters.me)
+def stopinit(client, message:Message):
+    event.set()
+    message.edit('+')
+    time.sleep(2)
+    message.delete()
+
+@client.on_message(filters.command('heart', '!!') & filters.me)
+def newhearts(client, message: Message):
+    mode = message.text.split()[1]
+    if mode == 'changesymbol':
+        symb = message.text.split()[2]
+        val = message.text.split()[3]
+        cur.execute('''UPDATE variables SET val=? WHERE key=?''', (val, symb))
+
+@client.on_message(filters.command('np', '!') & filters.me)
+def np(client, message: Message):
+    now = grate.nowplaying()
+    if not now[0] == 'nothing':
+        message.edit(f'{ln(26)[0]}**{now[0].split(".")[0].capitalize()}**\n{ln(26)[1]}{now[2]}\n{ln(26)[2]}{now[3]}')
+    else:
+        message.edit(ln(26)[3])
+
+@client.on_message(filters.command('sb', '!') & filters.me)
+def sb(client, message: Message):
+    message.edit('Spamblock?')
+    chatid = message.chat.id
+    msg1 = message
+    time.sleep(1)
+    msg2 = client.send_message(chatid, 'Really?')
+    time.sleep(1)
+    msg1.edit_text('Ok')
+    msg2.edit_text('...')
+    time.sleep(1)
+    msg2.delete()
+    msg1.edit_text('Maybe')
+    msg3 = client.send_message(chatid, 'NOT???')
+    time.sleep(1)
+    msg3.delete()
+    msg1.delete()
+    msg1 = client.send_message(chatid, 'HAHAHAHAHAHAHAHAH')
+    time.sleep(0.3)
+    msg2 = client.send_message(chatid, 'THERE IS NOT SPAMBLOCK')
+    time.sleep(1)
+    msg1.delete()
+    msg2.delete()
+    msg1 = client.send_message(chatid, 'huh.. okay...')
+    time.sleep(1)
+    msg1.edit_text('But can you see...')
+    time.sleep(1)
+    msg1.delete()
+    msg1 = client.send_message(chatid, 'THIS???')
+    msg2 = client.send_message(chatid, 'THIS???')
+    msg3 = client.send_message(chatid, 'THIS???')
+    msg4 = client.send_message(chatid, 'THIS???')
+    msg5 = client.send_message(chatid, 'THIS???')
+    msg6 = client.send_message(chatid, 'THIS???')
+    msg7 = client.send_message(chatid, 'THIS???')
+    msg8 = client.send_message(chatid, 'THIS???')
+    time.sleep(1)
+    msg1.delete()
+    msg2.delete()
+    msg3.delete()
+    msg4.delete()
+    msg5.delete()
+    msg6.delete()
+    msg7.delete()
+    msg8.delete()
+    msg1 = client.send_message(chatid, 'Okay')
+    time.sleep(0.3)
+    msg2 = client.send_message(chatid, 'Sorry')
+    time.sleep(1)
+    msg1.delete()
+    msg2.delete()
+    msg1 = client.send_message(chatid, 'Userbot: @TelehashDev')
+    time.sleep(3)
+    msg1.delete()
+
+@client.on_message(filters.command('bot', '!') & filters.me)
+def botstat(client, message: Message):
+    message.edit(f'{ln(27)[0]}{str(datetime.now() - runTime).split(".")[0]} / {str(datetime.now() - startTime).split(".")[0]}')
+
+@client.on_message(filters.me)
+def edittags(client, message: Message):
+    text = message.text
+    try:
+        if '{time}' in text:
+            text = text.replace('{time}', str(datetime.now().time()).split('.')[0])
+        if '{date}' in text:
+            text = text.replace('{date}', str(datetime.now().date()))
+        if '{nowartist}' in text:
+            text = text.replace('{nowartist}', grate.nowplaying()[2])
+        if '{nowname}' in text:
+            text = text.replace('{nowname}', grate.nowplaying()[3])
+        if '{phone}' in text:
+            text = text.replace('{phone}', '+'+str(client.get_me().phone_number))
+        if '{id}' in text:
+            text = text.replace('{id}', str(client.get_me().id))
+        if '{chatid}' in text:
+            text = text.replace('{chatid}', str(message.chat.id))
+        if '{ver}' in text:
+            text = text.replace('{ver}', v)
+        if '{userid}' in text:
+            try:
+                text = text.replace('{userid}', str(message.reply_to_message.from_user.id))
+            except:
+                text = text.replace('{userid}', '$noreply')
+    except:
+        pass
+    if not text == message.text:
+        message.edit(text)
+
 clear()
 if lng == '1':
-    print(f'Hello, You`re using Telehash with version v.{v}\nChat commands list\n\n!type [text] - type your text letter to letter\n!heart [1-2] - send animated heart\n!au - send author+user information, sub to our news channel\n!rib - send animated Georges ribbon (event on may, 9)\n!spoti - send the song you are listening to to the chat (Restrictions: Spotify, Windows, exe application)\n. - forward message\n!roll [from] [to] - send a random value between from and to \n!try [question] - get the answer to the question in the form of false/true\n!add [name] - save message text (need be reply to another message) in DB with name\n!del [name] <name or id> - delete variable from database\n!put [name] <name or id> - put text with its name (or id)\n!list - list of saved vars')
+    print(f'{text}\nv.{v}\nChat commands list\n\n!type [text] - type your text letter to letter\n!heart [1-2] - send animated heart\n!au - send author+user information, sub to our news channel\n!rib - send animated Georges ribbon (event on may, 9)\n!spoti - send the song you are listening to to the chat (Restrictions: Spotify, exe application)\n. - forward message\n!roll [from] [to] - send a random value between from and to \n!try [question] - get the answer to the question in the form of false/true\n!add [name] - save message text (need be reply to another message) in DB with name\n!del [name] <name or id> - delete variable from database\n!put [name] <name or id> - put text with its name (or id)\n!list - list of saved vars')
     print('----------')
-    if desc == '1':
+    if chints == '1':
         print(ln(23)[1])
     print(ln(12))
 elif lng == '2':
-    print(f'Привет, Вы используете Telehash на версии v.{v}\nСписок команд для чата\n\n!type [text] - написать Ваше сообщение побуквенно\n!heart [1-2] - отправить анимированное сердце\n!au - отправить информацию о разработчике и пользователе, подписаться на новостной канал\n!rib - отправить анимированную Георгиевскую ленту (событие на 9 мая)\n!spoti - отправить прослушиваемую песню в чат (Ограничения: Spotify, Windows, exe-приложение)\n. - переслать сообщение\n!roll [от] [до] - отправить случайное значение между от и до\n!try [вопрос] - получить ответ на вопрос в виде ложь/истина\n!add [имя] - сохранить текст сообщения (нужно отправлять ответом на сообщение) в базу данных под установленным именем\n!put [имя] <name или id> - вставить сохранённый текст под установленным именем (или id)\n!del [имя] <name или id> - удалить значение из базы данных\n!list - список сохранённых значений')
+    print(f'{text}\nv.{v}\n\nСписок команд для чата\n\n!type [text] - написать Ваше сообщение побуквенно\n!heart [1-2] - отправить анимированное сердце\n!au - отправить информацию о разработчике и пользователе, подписаться на новостной канал\n!rib - отправить анимированную Георгиевскую ленту (событие на 9 мая)\n!spoti - отправить прослушиваемую песню в чат (Ограничения: Spotify, exe-приложение)\n. - переслать сообщение\n!roll [от] [до] - отправить случайное значение между от и до\n!try [вопрос] - получить ответ на вопрос в виде ложь/истина\n!add [имя] - сохранить текст сообщения (нужно отправлять ответом на сообщение) в базу данных под установленным именем\n!put [имя] <name или id> - вставить сохранённый текст под установленным именем (или id)\n!del [имя] <name или id> - удалить значение из базы данных\n!list - список сохранённых значений\n!np - показать, что вы слушаете')
     print('----------')
-    if desc == '1':
+    if chints == '1':
         print(ln(23)[1])
     print(ln(12))
 
-# run на start не меняй, будет пиздец, 1 цикл вместо повтора
 client.run()
