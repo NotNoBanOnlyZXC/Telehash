@@ -1,21 +1,17 @@
-from    config          import  text
-from    datetime        import  datetime
+from    config              import  text
+from    datetime            import  datetime
 startTime = datetime.now()
-from    rich            import  print
-from    rich.console    import  Console
-from    rich.traceback  import  install
-install()
 print(text)
-import  os, time, concurrent.futures, platform
-import  random          as      r
-from    threading       import  Event
-from    pyrogram        import  filters, Client
-from    pyrogram.raw    import  functions
-from    pyrogram.types  import  Message
-from    pyrogram.errors import  FloodWait
-import  integrate       as      grate
-from    config          import  api_id, api_hash, v, heart1, georg, heart2, ghoul
-from    subprocess      import  Popen
+import  os, time, concurrent.futures, googletrans, sys
+import  soundfile           as      sf
+import  random              as      r
+from    googletrans         import  Translator
+from    threading           import  Event
+from    pyrogram            import  filters, Client, enums
+from    pyrogram.types      import  Message
+import  integrate           as      grate
+from    config              import  api_id, api_hash, v, heart1, georg, heart2, ghoul, heart3, men, mru
+import  speech_recognition  as      sr
 
 def clear():
     os.system('cls')
@@ -70,23 +66,32 @@ cur.execute('''CREATE TABLE IF NOT EXISTS messages(
              id INTEGER PRIMARY KEY AUTOINCREMENT,
              name INTEGER NOT NULL,
              message INTEGER NOT NULL);''')
+
+cur.execute('''CREATE TABLE IF NOT EXISTS settings(
+             key TEXT NOT NULL,
+             val TEXT NOT NULL);''')
+
 clear()
 chints = input(f'{ln(23)[0]}\n1 - Yes\n0 - No\n')
 clear()
 beta = input(ln(25)[0])
+clear()
+console = input(ln(29)[0])
+clear()
 if chints == '1':
     cur.execute('''CREATE TABLE IF NOT EXISTS profile(
              id INTEGER PRIMARY KEY AUTOINCREMENT,
              val TEXT NOT NULL,
              type TEXT NOT NULL);''')
-    cur.execute('''CREATE TABLE IF NOT EXISTS settings(
-             key TEXT NOT NULL,
-             val TEXT NOT NULL);''')
     
     cur.execute("SELECT EXISTS(SELECT 1 FROM settings WHERE key='name_interval' LIMIT 1)")
     result = cur.fetchone()
     if result[0] == 0:
         cur.execute("INSERT INTO settings (key, val) VALUES (?, ?)", ('name_interval', '60'))
+    cur.execute("SELECT EXISTS(SELECT 1 FROM settings WHERE key='desc_interval' LIMIT 1)")
+    result = cur.fetchone()
+    if result[0] == 0:
+        cur.execute("INSERT INTO settings (key, val) VALUES (?, ?)", ('desc_interval', '60'))
     cur.execute("SELECT EXISTS(SELECT 1 FROM settings WHERE key='chints_interval' LIMIT 1)")
     result = cur.fetchone()
     if result[0] == 0:
@@ -117,13 +122,15 @@ if beta == '1':
     if result == 0:
         cur.execute("INSERT INTO variables (key, val) VALUES (?, ?)", ('green', '💚'))
     conn.commit()
-
+sstat = 1
 client = Client(user, api_id, api_hash, (f"Bot v.{v} | {languages[int(lng)-1]}"), (f"Telehash on {name}'s device"))
 print(f'{ln(17)} {user}')
 runTime = datetime.now()
 
 @client.on_message(filters.command("type", prefixes='!') & filters.me)
 def type(client, message: Message):
+    global sstat
+    sstat = sstat+1
     input_text = message.text.split("!type ", maxsplit=1)[1]
     temp_text = input_text
     edited_text = ""
@@ -142,12 +149,16 @@ def type(client, message: Message):
 
 @client.on_message(filters.command("heart", prefixes='!') & filters.me)
 def hearts(client, message: Message):
+    global sstat
+    sstat = sstat+1
     print('\n')
     try:
         if message.text.split(' ')[1] == '1':
             heart = heart1
         elif message.text.split(' ')[1] == '2':
             heart = heart2
+        elif message.text.split(' ')[1] == '3':
+            heart = heart3
         for i in range(len(heart)):
             print(f'{ln(6)} {len(heart)-i-1}', end='\r ')
             message.edit(heart[i])
@@ -158,6 +169,8 @@ def hearts(client, message: Message):
 
 @client.on_message(filters.command('rib', prefixes='!') & filters.me)
 def rib(client, message: Message):
+    global sstat
+    sstat = sstat+1
     print('\n')
     message.edit(ln(10))
     for o in range(4):
@@ -173,6 +186,8 @@ def rib(client, message: Message):
 
 @client.on_message(filters.command("au", prefixes='!'))
 def au(client, message: Message):
+    global sstat
+    sstat = sstat+1
     try:
         message.edit(f'{ln(7)} {message.from_user.first_name}')
         client.join_chat('@telehashdev')
@@ -182,6 +197,8 @@ def au(client, message: Message):
 
 @client.on_message(filters.command('spoti', prefixes='!') & filters.me)
 def spot(client, message: Message):
+    global sstat
+    sstat = sstat+1
     try:
         author, song = grate.spotify()[1], grate.spotify()[2]
         message.edit(f'{ln(11)[0]}\n{ln(11)[1]}{author}\n{ln(11)[2]}{song}')
@@ -190,12 +207,16 @@ def spot(client, message: Message):
 
 @client.on_message(filters.command('.', prefixes='.') & filters.me)
 def tochka(client, message: Message):
+    global sstat
+    sstat = sstat+1
     message.delete()
     client.send_message(message.chat.id, (f'{ln(13)}{message.reply_to_message.from_user.first_name}'))
     client.copy_message(message.chat.id, message.chat.id, message.reply_to_message.id)
 
 @client.on_message(filters.command('roll', '!') & filters.me)
 def roll(client, message: Message):
+    global sstat
+    sstat = sstat+1
     try:
         frm = message.text.split(' ')[1]
         to = message.text.split(' ')[2]
@@ -205,6 +226,8 @@ def roll(client, message: Message):
 
 @client.on_message(filters.command('try', '!') & filters.me)
 def trry(client, message: Message):
+    global sstat
+    sstat = sstat+1
     try:
         right = message.text.split(' ', 1)[1]
         message.edit(f'{right.capitalize()}: **{ln(16)[grate.trry()]}**')
@@ -213,6 +236,8 @@ def trry(client, message: Message):
 
 @client.on_message(filters.command('add', '!') & filters.me)
 def addtext(client, message: Message):
+    global sstat
+    sstat = sstat+1
     namex = message.text.split() # namex[1]
     textx = message.reply_to_message.text
     try:
@@ -228,6 +253,8 @@ def addtext(client, message: Message):
 
 @client.on_message(filters.command('del', '!') & filters.me)
 def deltext(client, message: Message):
+    global sstat
+    sstat = sstat+1
     id = message.text.split()[1]
     try:
         typ = message.text.split()[2]
@@ -260,6 +287,8 @@ def deltext(client, message: Message):
 
 @client.on_message(filters.command('put', '!') & filters.me)
 def put(client, message: Message):
+    global sstat
+    sstat = sstat+1
     id = message.text.split()[1]
     try:
         typ = message.text.split()[2]
@@ -286,6 +315,8 @@ def put(client, message: Message):
 
 @client.on_message(filters.command('list', '!') & filters.me)
 def list(client, message: Message):
+    global sstat
+    sstat = sstat+1
     cur.execute("SELECT id, name FROM messages")
     rows = cur.fetchall()
     all = ln(20)
@@ -295,12 +326,16 @@ def list(client, message: Message):
         
 @client.on_message(filters.command('ghoul', '!') & filters.me)
 def ghoul_activate(client, message: Message):
+    global sstat
+    sstat = sstat+1
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.submit(ghoul1, client, message)
         executor.submit(ghoul2, client, message)
 
 @client.on_message(filters.command('name', '!') & filters.me)
 def name_r(client, message:Message):
+    global sstat
+    sstat = sstat+1
     if chints == '1':
         sp = message.text.split(maxsplit=2)
         if sp[1] == 'list':
@@ -350,6 +385,8 @@ def name_r(client, message:Message):
 
 @client.on_message(filters.command('chints', '!') & filters.me)
 def chints_r(client, message:Message):
+    global sstat
+    sstat = sstat+1
     if chints == '1':
         sp = message.text.split(maxsplit=2)
         if sp[1] == 'list':
@@ -419,6 +456,8 @@ def ghoul2(client, message: Message):
 event = Event()
 @client.on_message(filters.command('init', '!!') & filters.me)
 def inithere(client, message:Message):
+    global sstat
+    sstat = sstat+1
     cur.execute('SELECT val FROM profile WHERE type=?', ('name',))
     names = cur.fetchall()
     cur.execute('SELECT val FROM profile WHERE type=?', ('chints',))
@@ -466,6 +505,8 @@ def chintschint(chintss, intr, event):
 
 @client.on_message(filters.command('stop', '!!') & filters.me)
 def stopinit(client, message:Message):
+    global sstat
+    sstat = sstat+1
     event.set()
     message.edit('+')
     time.sleep(2)
@@ -473,78 +514,116 @@ def stopinit(client, message:Message):
 
 @client.on_message(filters.command('heart', '!!') & filters.me)
 def newhearts(client, message: Message):
+    global sstat
+    sstat = sstat+1
     mode = message.text.split()[1]
-    if mode == 'changesymbol':
+    if mode == 'chsum':
         symb = message.text.split()[2]
         val = message.text.split()[3]
         cur.execute('''UPDATE variables SET val=? WHERE key=?''', (val, symb))
+    if mode == 'addanim':
+        anim = message.text.split('', 3)[2]
+        
 
 @client.on_message(filters.command('np', '!') & filters.me)
 def np(client, message: Message):
+    global sstat
+    sstat = sstat+1
     now = grate.nowplaying()
     if not now[0] == 'nothing':
         message.edit(f'{ln(26)[0]}**{now[0].split(".")[0].capitalize()}**\n{ln(26)[1]}{now[2]}\n{ln(26)[2]}{now[3]}')
     else:
         message.edit(ln(26)[3])
 
-@client.on_message(filters.command('sb', '!') & filters.me)
-def sb(client, message: Message):
-    message.edit('Spamblock?')
-    chatid = message.chat.id
-    msg1 = message
-    time.sleep(1)
-    msg2 = client.send_message(chatid, 'Really?')
-    time.sleep(1)
-    msg1.edit_text('Ok')
-    msg2.edit_text('...')
-    time.sleep(1)
-    msg2.delete()
-    msg1.edit_text('Maybe')
-    msg3 = client.send_message(chatid, 'NOT???')
-    time.sleep(1)
-    msg3.delete()
-    msg1.delete()
-    msg1 = client.send_message(chatid, 'HAHAHAHAHAHAHAHAH')
-    time.sleep(0.3)
-    msg2 = client.send_message(chatid, 'THERE IS NOT SPAMBLOCK')
-    time.sleep(1)
-    msg1.delete()
-    msg2.delete()
-    msg1 = client.send_message(chatid, 'huh.. okay...')
-    time.sleep(1)
-    msg1.edit_text('But can you see...')
-    time.sleep(1)
-    msg1.delete()
-    msg1 = client.send_message(chatid, 'THIS???')
-    msg2 = client.send_message(chatid, 'THIS???')
-    msg3 = client.send_message(chatid, 'THIS???')
-    msg4 = client.send_message(chatid, 'THIS???')
-    msg5 = client.send_message(chatid, 'THIS???')
-    msg6 = client.send_message(chatid, 'THIS???')
-    msg7 = client.send_message(chatid, 'THIS???')
-    msg8 = client.send_message(chatid, 'THIS???')
-    time.sleep(1)
-    msg1.delete()
-    msg2.delete()
-    msg3.delete()
-    msg4.delete()
-    msg5.delete()
-    msg6.delete()
-    msg7.delete()
-    msg8.delete()
-    msg1 = client.send_message(chatid, 'Okay')
-    time.sleep(0.3)
-    msg2 = client.send_message(chatid, 'Sorry')
-    time.sleep(1)
-    msg1.delete()
-    msg2.delete()
-    msg1 = client.send_message(chatid, 'Userbot: @TelehashDev')
-    time.sleep(3)
-    msg1.delete()
-
 @client.on_message(filters.command('bot', '!') & filters.me)
 def botstat(client, message: Message):
-    message.edit(f'{ln(27)[0]}{str(datetime.now() - runTime).split(".")[0]} / {str(datetime.now() - startTime).split(".")[0]}')
+    global sstat
+    sstat = sstat+1
+    message.edit(f'{ln(27)[0]}{str(datetime.now() - runTime).split(".")[0]} / {str(datetime.now() - startTime).split(".")[0]}\n{ln(27)[1]}{str(sstat)}\n{v}')
+
+@client.on_message(filters.command('translate', '!')) #  & filters.me
+def translate(client, message: Message):
+    global sstat
+    sstat = sstat+1
+    if message.text.split()[1] == 'langs':
+        a = ''
+        for short, long in googletrans.LANGUAGES.items():
+            a = a+long.capitalize()+' - '+short+'\n'
+        message.edit(a)
+    translator = Translator()
+    result = translator.translate(text=message.reply_to_message.text, dest=message.text.split()[1])
+    try:
+        message.edit(f'{googletrans.LANGUAGES[result.src].capitalize()} -> {googletrans.LANGUAGES[message.text.split()[1]].capitalize()}\n{result.text}')
+    except:
+        client.send_message(message.chat.id, f'{googletrans.LANGUAGES[result.src].capitalize()} -> {googletrans.LANGUAGES[message.text.split()[1]].capitalize()}\n{result.text}')
+
+@client.on_message(filters.command('v2t', '!') & filters.me)
+def voicetext(client, message: Message):
+    global sstat
+    sstat = sstat+1
+    message.edit(ln(28)[0])
+    rec = sr.Recognizer()
+    voice = client.download_media(message.reply_to_message.voice.file_id, './v2t/')
+    filename = voice.split('\\v2t\\', 1)[1].split('.')[0]
+    file_name_full="./v2t/"+filename+".ogg"
+    file_name_full_converted="./v2t/"+filename+".wav"
+    data, samplerate = sf.read(file_name_full)
+    sf.write(file_name_full_converted, data, samplerate)
+    try:
+        with sr.AudioFile(file_name_full_converted) as source:
+            audio_text = rec.listen(source)
+            text = ln(28)[1]+rec.recognize_google(audio_text,language='ru_RU')
+            message.edit(text)
+    except:
+        message.edit(ln(28)[2])
+    os.remove(file_name_full)
+    os.remove(file_name_full_converted)
+
+@client.on_message(filters.command('off', '!!') & filters.me)
+def off(client, message: Message):
+    global sstat
+    sstat = sstat+1
+    var = message.text.split()[1]
+    if var == 'bot':
+        sys.exit()
+    if var == 'pc':
+        os.system('shutdown -s')
+    if var == 'pc.kill':
+        os.system('shutdown -p')
+
+@client.on_message(filters.command('console', '!') & filters.me)
+def consoles(client, message: Message):
+    global sstat
+    sstat = sstat+1
+    message.text.split(' ', 1)[1]
+    if console == '1':
+        message.edit('Done')
+        os.system(message.text.split(' ', 1)[1])
+    else:
+        message.delete()
+
+morsel = {}
+if lng == '1':
+    morselang = men
+elif lng == '2':
+    morsel = mru
+morsereverse = {value: key for key, value in morsel.items()}
+
+def to_morse(s):
+    return ' '.join(morsel.get(i.upper()) for i in s)
+def from_morse(s):
+    return ''.join(morsereverse.get(i) for i in s.split()).lower()
+
+@client.on_message(filters.command('morse', '!') & filters.me)
+def morse(client, message: Message):
+    if message.text.split(' ')[1] == 'to':
+        try:
+            message.edit(to_morse(message.text.split(' ', 2)[2]), parse_mode=enums.ParseMode.HTML)
+        except:
+            message.edit(to_morse(message.reply_to_message.text), parse_mode=enums.ParseMode.HTML)
+    elif message.text.split(' ')[1] == 'from':
+        message.edit('💡 Morse: '+from_morse(message.reply_to_message.text))
+
 
 @client.on_message(filters.me)
 def edittags(client, message: Message):
@@ -566,6 +645,11 @@ def edittags(client, message: Message):
             text = text.replace('{chatid}', str(message.chat.id))
         if '{ver}' in text:
             text = text.replace('{ver}', v)
+        if '{replyid}' in text:
+            try:
+                text = text.replace('{replyid}', str(message.reply_to_message.id))
+            except:
+                text = text.replace('{replyid}', '$noreply')
         if '{userid}' in text:
             try:
                 text = text.replace('{userid}', str(message.reply_to_message.from_user.id))
@@ -578,14 +662,12 @@ def edittags(client, message: Message):
 
 clear()
 if lng == '1':
-    print(f'{text}\nv.{v}\nChat commands list\n\n!type [text] - type your text letter to letter\n!heart [1-2] - send animated heart\n!au - send author+user information, sub to our news channel\n!rib - send animated Georges ribbon (event on may, 9)\n!spoti - send the song you are listening to to the chat (Restrictions: Spotify, exe application)\n. - forward message\n!roll [from] [to] - send a random value between from and to \n!try [question] - get the answer to the question in the form of false/true\n!add [name] - save message text (need be reply to another message) in DB with name\n!del [name] <name or id> - delete variable from database\n!put [name] <name or id> - put text with its name (or id)\n!list - list of saved vars')
-    print('----------')
+    print(f'{text}\nv.{v}\nГ Chat commands list\n\n| !type [text] - type your text letter to letter\n| !heart [1-2] - send animated heart\n| !au - send author+user information, sub to our news channel\n| !rib - send animated Georges ribbon (event on may, 9)\n| !spoti - send the song you are listening to to the chat (Restrictions: Spotify, exe application)\n| .. - forward message\n!roll [from] [to] - send a random value between from and to \n!try [question] - get the answer to the question in the form of false/true\n!add [name] - save message text (need be reply to another message) in DB with name\n| !del [name] <name or id> - delete variable from database\n| !put [name] <name or id> - put text with its name (or id)\n| !list - list of saved vars\n| !np - show that you are listening to \n| !bot - output session statistics\n| !translate [language/langs] - by sending a reply to a message, it will translate it into the selected language\n| !v2t - translation of a voice message into text\n| !console [cmd] - use the console (if enabled)\n| !!off [bot/pc/pc.kill] - turn off the bot/computer/computer quickly\nL [NEW]!morse to/from [text] - translate in Morse code (you can send in response to a message without specifying the text)\n')
     if chints == '1':
         print(ln(23)[1])
     print(ln(12))
 elif lng == '2':
-    print(f'{text}\nv.{v}\n\nСписок команд для чата\n\n!type [text] - написать Ваше сообщение побуквенно\n!heart [1-2] - отправить анимированное сердце\n!au - отправить информацию о разработчике и пользователе, подписаться на новостной канал\n!rib - отправить анимированную Георгиевскую ленту (событие на 9 мая)\n!spoti - отправить прослушиваемую песню в чат (Ограничения: Spotify, exe-приложение)\n. - переслать сообщение\n!roll [от] [до] - отправить случайное значение между от и до\n!try [вопрос] - получить ответ на вопрос в виде ложь/истина\n!add [имя] - сохранить текст сообщения (нужно отправлять ответом на сообщение) в базу данных под установленным именем\n!put [имя] <name или id> - вставить сохранённый текст под установленным именем (или id)\n!del [имя] <name или id> - удалить значение из базы данных\n!list - список сохранённых значений\n!np - показать, что вы слушаете')
-    print('----------')
+    print(f'{text}\nv.{v}\n\nГ Список команд для чата\n|\n| !type [text] - написать Ваше сообщение побуквенно\n| !heart [1-2] - отправить анимированное сердце\n| !au - отправить информацию о разработчике и пользователе, подписаться на новостной канал\n| !rib - отправить анимированную Георгиевскую ленту (событие на 9 мая)\n| !spoti - отправить прослушиваемую песню в чат (Ограничения: Spotify, exe-приложение)\n| .. - переслать сообщение\n| !roll [от] [до] - отправить случайное значение между от и до\n| !try [вопрос] - получить ответ на вопрос в виде ложь/истина\n| !add [имя] - сохранить текст сообщения (нужно отправлять ответом на сообщение) в базу данных под установленным именем\n| !put [имя] <name или id> - вставить сохранённый текст под установленным именем (или id)\n| !del [имя] <name или id> - удалить значение из базы данных\n| !list - список сохранённых значений\n| !np - показать, что вы слушаете\n| !bot - вывести статистику сессии\n| !translate [язык/langs] - отправив в ответ на сообщение переведёт его на выбранный язык\n| !v2t - перевод голосового сообщения в текст\n| !console [кмд] - использовать консоль (если включено)\n| !!off [bot/pc/pc.kill] - выключить бота/компьютер/компьютер быстро\nL [NEW]!morse to/from [текст] - перевести по азбуке Морзе (можно отправить в ответ на сообщение не указывая текст)\n')
     if chints == '1':
         print(ln(23)[1])
     print(ln(12))
