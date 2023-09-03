@@ -2,7 +2,7 @@ from    config              import  text
 from    datetime            import  datetime
 startTime = datetime.now()
 print(text)
-import  os, time, concurrent.futures, googletrans, sys
+import  os, time, concurrent.futures, googletrans, sys, re, requests
 import  soundfile           as      sf
 import  random              as      r
 from    googletrans         import  Translator
@@ -12,6 +12,8 @@ from    pyrogram.types      import  Message
 import  integrate           as      grate
 from    config              import  api_id, api_hash, v, heart1, georg, heart2, ghoul, heart3, men, mru
 import  speech_recognition  as      sr
+import  cryptocode          as      cc
+translator = Translator()
 
 def clear():
     os.system('cls')
@@ -550,7 +552,6 @@ def translate(client, message: Message):
         for short, long in googletrans.LANGUAGES.items():
             a = a+long.capitalize()+' - '+short+'\n'
         message.edit(a)
-    translator = Translator()
     result = translator.translate(text=message.reply_to_message.text, dest=message.text.split()[1])
     try:
         message.edit(f'{googletrans.LANGUAGES[result.src].capitalize()} -> {googletrans.LANGUAGES[message.text.split()[1]].capitalize()}\n{result.text}')
@@ -616,6 +617,8 @@ def from_morse(s):
 
 @client.on_message(filters.command('morse', '!') & filters.me)
 def morse(client, message: Message):
+    global sstat
+    sstat = sstat+1
     if message.text.split(' ')[1] == 'to':
         try:
             message.edit(to_morse(message.text.split(' ', 2)[2]), parse_mode=enums.ParseMode.HTML)
@@ -624,6 +627,42 @@ def morse(client, message: Message):
     elif message.text.split(' ')[1] == 'from':
         message.edit('💡 Morse: '+from_morse(message.reply_to_message.text))
 
+@client.on_message(filters.command('crypt', '!') & filters.me)
+def crypt(client, message: Message):
+    global sstat
+    sstat = sstat+1
+    split = message.text.split(' ', 2)
+    message.edit(cc.encrypt(split[2], split[1]))
+    client.send_message('me', f'Crypt password: {split[1]}')
+
+@client.on_message(filters.command('decrypt', '!') & filters.me)
+def decrypt(client, message: Message):
+    global sstat
+    sstat = sstat+1
+    split = message.text.split(' ', 2)
+    try:
+        message.edit(f'Decrypted: {cc.decrypt(split[2], split[1])}')
+    except:
+        message.edit(f'Decrypted: {cc.decrypt(message.reply_to_message.text, split[1])}')
+
+@client.on_message(filters.command('spam', '!') & filters.me)
+def spam(client, message: Message):
+    global sstat
+    sstat = sstat+1
+    split = message.text.split(' ', 2)
+    message.delete()
+    for i in range(int(split[1])):
+        client.send_message(message.chat.id, split[2], disable_web_page_preview=True)
+
+@client.on_message(filters.command('joke', '!') & filters.me)
+def joke(client, message: Message):
+    global sstat
+    sstat = sstat+1
+    resp = requests.get('https://v2.jokeapi.dev/joke/Dark?format=txt')
+    if lng == '2':
+        message.edit('😜 '+translator.translate(text=resp.text, dest='ru').text)
+    elif lng == '1':
+        message.edit('😜 '+resp.text)
 
 @client.on_message(filters.me)
 def edittags(client, message: Message):
@@ -659,17 +698,23 @@ def edittags(client, message: Message):
         pass
     if not text == message.text:
         message.edit(text)
+    try:
+        if re.search(r"\[(.*?)\]\((.*?)\)",text):
+            message.edit(text, disable_web_page_preview=True)
+    except:
+        pass
 
 clear()
 if lng == '1':
-    print(f'{text}\nv.{v}\nГ Chat commands list\n\n| !type [text] - type your text letter to letter\n| !heart [1-2] - send animated heart\n| !au - send author+user information, sub to our news channel\n| !rib - send animated Georges ribbon (event on may, 9)\n| !spoti - send the song you are listening to to the chat (Restrictions: Spotify, exe application)\n| .. - forward message\n!roll [from] [to] - send a random value between from and to \n!try [question] - get the answer to the question in the form of false/true\n!add [name] - save message text (need be reply to another message) in DB with name\n| !del [name] <name or id> - delete variable from database\n| !put [name] <name or id> - put text with its name (or id)\n| !list - list of saved vars\n| !np - show that you are listening to \n| !bot - output session statistics\n| !translate [language/langs] - by sending a reply to a message, it will translate it into the selected language\n| !v2t - translation of a voice message into text\n| !console [cmd] - use the console (if enabled)\n| !!off [bot/pc/pc.kill] - turn off the bot/computer/computer quickly\nL [NEW]!morse to/from [text] - translate in Morse code (you can send in response to a message without specifying the text)\n')
+    print(f'{text}\nv.{v}\nГ Chat commands list\n\n| !type [text] - type your text letter to letter\n| !heart [1-2] - send animated heart\n| !au - send author+user information, sub to our news channel\n| !rib - send animated Georges ribbon (event on may, 9)\n| !spoti - send the song you are listening to to the chat (Restrictions: Spotify, exe application)\n| .. - forward message\n!roll [from] [to] - send a random value between from and to \n!try [question] - get the answer to the question in the form of false/true\n!add [name] - save message text (need be reply to another message) in DB with name\n| !del [name] <name or id> - delete variable from database\n| !put [name] <name or id> - put text with its name (or id)\n| !list - list of saved vars\n| !np - show that you are listening to \n| !bot - output session statistics\n| !translate [language/langs] - by sending a reply to a message, it will translate it into the selected language\n| !v2t - translation of a voice message into text\n| !console [cmd] - use the console (if enabled)\n| !!off [bot/pc/pc.kill] - turn off the bot/computer/computer quickly\nL [NEW]!morse to/from [text] - translate in Morse code (you can send in response to a message without specifying the text)\n| [NEW] !crypt [password] [text] - encrypt the message\n| [NEW] !decrypt [password] [cipher] - decrypt the interlocutor\'s message, you can send a response \nL [NEW] !spam [number] [message] - spam the specified number of messages with text\n')
+    print(ln(30))
     if chints == '1':
         print(ln(23)[1])
     print(ln(12))
 elif lng == '2':
-    print(f'{text}\nv.{v}\n\nГ Список команд для чата\n|\n| !type [text] - написать Ваше сообщение побуквенно\n| !heart [1-2] - отправить анимированное сердце\n| !au - отправить информацию о разработчике и пользователе, подписаться на новостной канал\n| !rib - отправить анимированную Георгиевскую ленту (событие на 9 мая)\n| !spoti - отправить прослушиваемую песню в чат (Ограничения: Spotify, exe-приложение)\n| .. - переслать сообщение\n| !roll [от] [до] - отправить случайное значение между от и до\n| !try [вопрос] - получить ответ на вопрос в виде ложь/истина\n| !add [имя] - сохранить текст сообщения (нужно отправлять ответом на сообщение) в базу данных под установленным именем\n| !put [имя] <name или id> - вставить сохранённый текст под установленным именем (или id)\n| !del [имя] <name или id> - удалить значение из базы данных\n| !list - список сохранённых значений\n| !np - показать, что вы слушаете\n| !bot - вывести статистику сессии\n| !translate [язык/langs] - отправив в ответ на сообщение переведёт его на выбранный язык\n| !v2t - перевод голосового сообщения в текст\n| !console [кмд] - использовать консоль (если включено)\n| !!off [bot/pc/pc.kill] - выключить бота/компьютер/компьютер быстро\nL [NEW]!morse to/from [текст] - перевести по азбуке Морзе (можно отправить в ответ на сообщение не указывая текст)\n')
+    print(f'{text}\nv.{v}\n\nГ Список команд для чата\n|\n| !type [text] - написать Ваше сообщение побуквенно\n| !heart [1-2] - отправить анимированное сердце\n| !au - отправить информацию о разработчике и пользователе, подписаться на новостной канал\n| !rib - отправить анимированную Георгиевскую ленту (событие на 9 мая)\n| !spoti - отправить прослушиваемую песню в чат (Ограничения: Spotify, exe-приложение)\n| .. - переслать сообщение\n| !roll [от] [до] - отправить случайное значение между от и до\n| !try [вопрос] - получить ответ на вопрос в виде ложь/истина\n| !add [имя] - сохранить текст сообщения (нужно отправлять ответом на сообщение) в базу данных под установленным именем\n| !put [имя] <name или id> - вставить сохранённый текст под установленным именем (или id)\n| !del [имя] <name или id> - удалить значение из базы данных\n| !list - список сохранённых значений\n| !np - показать, что вы слушаете\n| !bot - вывести статистику сессии\n| !translate [язык/langs] - отправив в ответ на сообщение переведёт его на выбранный язык\n| !v2t - перевод голосового сообщения в текст\n| !console [кмд] - использовать консоль (если включено)\n| !!off [bot/pc/pc.kill] - выключить бота/компьютер/компьютер быстро\n| !morse to/from [текст] - перевести по азбуке Морзе (можно отправить в ответ на сообщение не указывая текст)\n| [NEW] !crypt [пароль] [текст] - зашифровать сообщение\n| [NEW] !decrypt [пароль] [шифр] - дешифровать сообщение собеседника, можно отправить ответом\n| [NEW] !spam [число] [сообщение] - проспамить текстом заданное число сообщений\nL [NEW] !joke - отправить шутку\n')
+    print(ln(30))
     if chints == '1':
         print(ln(23)[1])
     print(ln(12))
-
 client.run()

@@ -26,7 +26,7 @@ def trry():
 def fwws(sym):
     windows = []
     def callback(hwnd, lParam):
-        if sym in win32gui.GetWindowText(hwnd) and not ' - AutoHotkey' in win32gui.GetWindowText(hwnd) and not 'Яндекс Музыка' in win32gui.GetWindowText(hwnd) and not ' - Visual Studio' in win32gui.GetWindowText(hwnd):
+        if sym in win32gui.GetWindowText(hwnd) and not ' - AutoHotkey' in win32gui.GetWindowText(hwnd) and not 'Яндекс Музыка' in win32gui.GetWindowText(hwnd) and not ' - Visual Studio' in win32gui.GetWindowText(hwnd) and not 'Discord' in win32gui.GetWindowText(hwnd):
             windows.append(hwnd)
         return True
     
