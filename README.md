@@ -10,4 +10,7 @@ Telehash работает только при установке и запуск
 
 [Developer](https://t.me/nobanonlyzxc)
 
-[Tester](https://t.me/krean4ik)
+## Тестеры
+[Ikromax](https://t.me/krean4ik)
+
+[VOID](https://t.me/Morphyl)
