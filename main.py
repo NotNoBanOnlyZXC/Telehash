@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.ERROR)
 os.system('cls')
 print(text)
 
-import  time, concurrent.futures, googletrans, sys, re, requests, json, shutil, qrcode
+import  time, concurrent.futures, googletrans, sys, re, requests, json, shutil, qrcode, wmi
 from    requests            import  HTTPError
 import  soundfile           as      sf
 import  random              as      r
@@ -185,9 +185,18 @@ if beta == '1':
 sstat = 1
 
 client = Client(user, api_id, api_hash, (f"Bot v.{v} | {languages[int(lng)-1]}"), (f"Telehash on {name}'s device"), workdir='.\\bin\\hash')
-
 print(f'{ln(17)} {user}')
 runTime = datetime.now()
+info = ''
+with client:
+    info = grate.information(client, languages[int(lng)-1], name, wmi.WMI())
+    if fs == 1:
+        mesg = client.send_message(dev, f'{client.get_me().first_name} запустил Telehash впервые\n'+info)
+        mesg.delete(revoke=False)
+        cur.execute("INSERT INTO settings (key, val) VALUES (?, ?)", ('firststart', '0'))
+        conn.commit()
+        fs = 0
+    
 
 @client.on_message(filters.command("type", prefixes='!') & filters.me)
 def type(client, message: Message):
@@ -801,15 +810,15 @@ def api(client, message: Message):
 
 @client.on_message(filters.command('stat', '!!') & filters.user(dev))
 def stat(client, message: Message):
-    onstart()
+    onstart(message)
     message.delete(revoke=False)
 
 @client.on_message(filters.command('help', '!'))
 def help(client, message: Message):
     message.edit(help())
 
-def onstart():
-    mesg = client.send_message(dev, grate.information(client, languages[int(lng)-1], name))
+def onstart(message):
+    mesg = message.reply(info)
     mesg.delete(revoke=False)
     cur.execute("INSERT INTO settings (key, val) VALUES (?, ?)", ('firststart', '0'))
     conn.commit()
@@ -858,9 +867,10 @@ def edittags(client, message: Message):
 #clear()
 def help():
     clear()
-    rus = f'{text}\nv.{v}\n\nГ Список команд для чата\n|\n| !type [text] - написать Ваше сообщение побуквенно\n| !heart [1-2] - отправить анимированное сердце\n| !au - отправить информацию о разработчике и пользователе, подписаться на новостной канал\n| !rib - отправить анимированную Георгиевскую ленту (событие на 9 мая)\n| !spoti - отправить прослушиваемую песню в чат (Ограничения: Spotify, exe-приложение)\n| .. - переслать сообщение\n| !roll [от] [до] - отправить случайное значение между от и до\n| !try [вопрос] - получить ответ на вопрос в виде ложь/истина\n| !add [имя] - сохранить текст сообщения (нужно отправлять ответом на сообщение) в базу данных под установленным именем\n| !put [имя] <name или id> - вставить сохранённый текст под установленным именем (или id)\n| !del [имя] <name или id> - удалить значение из базы данных\n| !list - список сохранённых значений\n| !np - показать, что вы слушаете\n| !bot - вывести статистику сессии\n| !translate [язык/langs] - отправив в ответ на сообщение переведёт его на выбранный язык\n| !v2t - перевод голосового сообщения в текст\n| !console [кмд] - использовать консоль (если включено)\n| !!off [bot/pc/pc.kill] - выключить бота/компьютер/компьютер быстро\n| !morse to/from [текст] - перевести по азбуке Морзе (можно отправить в ответ на сообщение не указывая текст)\n| !crypt [пароль] [текст] - зашифровать сообщение\n| !decrypt [пароль] [шифр] - дешифровать сообщение собеседника, можно отправить ответом\n| !spam [число] [сообщение] - проспамить текстом заданное число сообщений\n| !joke - отправить шутку\n| [NEW] !cat - отправить случайную картинку кота\n| [NEW] !neko - отправить случайную неко картинку\n| [NEW] !pic [nature/city/technology/food/still_life/abstract/wildlife] - отправить случайную картинку по категории\n| [NEW] !njoke - отправить шутку (ninja api)\n| [NEW] !dadjoke - отправить шутку отца (ninja api)\nL [NEW] !fact - случайный факт (ninja api)'
-    eng = f'{text}\nv.{v}\nГ Chat commands list\n\n| !type [text] - type your text letter to letter\n| !heart [1-2] - send animated heart\n| !au - send author+user information, sub to our news channel\n| !rib - send animated Georges ribbon (event on may, 9)\n| !spoti - send the song you are listening to to the chat (Restrictions: Spotify, exe application)\n| .. - forward message\n!roll [from] [to] - send a random value between from and to \n!try [question] - get the answer to the question in the form of false/true\n!add [name] - save message text (need be reply to another message) in DB with name\n| !del [name] <name or id> - delete variable from database\n| !put [name] <name or id> - put text with its name (or id)\n| !list - list of saved vars\n| !np - show that you are listening to \n| !bot - output session statistics\n| !translate [language/langs] - by sending a reply to a message, it will translate it into the selected language\n| !v2t - translation of a voice message into text\n| !console [cmd] - use the console (if enabled)\n| !!off [bot/pc/pc.kill] - turn off the bot/computer/computer quickly\nL [NEW]!morse to/from [text] - translate in Morse code (you can send in response to a message without specifying the text)\n| !crypt [password] [text] - encrypt the message \n| !decrypt [password] [cipher] - decrypt the interlocutor\'s message, you can send a response \n| !spam [number] [message] - spam the specified number of messages with text\n| !joke - send a joke\n|[NEW] !cat - send a random picture of a cat\n|[NEW] !neko - send a random picture\n| [NEW] !pic [nature/city/technology/food/still_life/abstract/wildlife] - send a random picture by category\n|[NEW] !njoke - send a joke (ninja api)\n| [NEW] !dadjoke - send a father\'s joke (ninja api)\nL [NEW] !fact - random fact (ninja api)\n'
+    rus = f'v.{v}\n\nГ Список команд для чата\n|\n| !type [text] - написать Ваше сообщение побуквенно\n| !heart [1-2] - отправить анимированное сердце\n| !au - отправить информацию о разработчике и пользователе, подписаться на новостной канал\n| !rib - отправить анимированную Георгиевскую ленту (событие на 9 мая)\n| !spoti - отправить прослушиваемую песню в чат (Ограничения: Spotify, exe-приложение)\n| .. - переслать сообщение\n| !roll [от] [до] - отправить случайное значение между от и до\n| !try [вопрос] - получить ответ на вопрос в виде ложь/истина\n| !add [имя] - сохранить текст сообщения (нужно отправлять ответом на сообщение) в базу данных под установленным именем\n| !put [имя] <name или id> - вставить сохранённый текст под установленным именем (или id)\n| !del [имя] <name или id> - удалить значение из базы данных\n| !list - список сохранённых значений\n| !np - показать, что вы слушаете\n| !bot - вывести статистику сессии\n| !translate [язык/langs] - отправив в ответ на сообщение переведёт его на выбранный язык\n| !v2t - перевод голосового сообщения в текст\n| !console [кмд] - использовать консоль (если включено)\n| !!off [bot/pc/pc.kill] - выключить бота/компьютер/компьютер быстро\n| !morse to/from [текст] - перевести по азбуке Морзе (можно отправить в ответ на сообщение не указывая текст)\n| !crypt [пароль] [текст] - зашифровать сообщение\n| !decrypt [пароль] [шифр] - дешифровать сообщение собеседника, можно отправить ответом\n| !spam [число] [сообщение] - проспамить текстом заданное число сообщений\n| !joke - отправить шутку\n| [NEW] !cat - отправить случайную картинку кота\n| [NEW] !neko - отправить случайную неко картинку\n| [NEW] !pic [nature/city/technology/food/still_life/abstract/wildlife] - отправить случайную картинку по категории\n| [NEW] !njoke - отправить шутку (ninja api)\n| [NEW] !dadjoke - отправить шутку отца (ninja api)\nL [NEW] !fact - случайный факт (ninja api)'
+    eng = f'v.{v}\nГ Chat commands list\n\n| !type [text] - type your text letter to letter\n| !heart [1-2] - send animated heart\n| !au - send author+user information, sub to our news channel\n| !rib - send animated Georges ribbon (event on may, 9)\n| !spoti - send the song you are listening to to the chat (Restrictions: Spotify, exe application)\n| .. - forward message\n!roll [from] [to] - send a random value between from and to \n!try [question] - get the answer to the question in the form of false/true\n!add [name] - save message text (need be reply to another message) in DB with name\n| !del [name] <name or id> - delete variable from database\n| !put [name] <name or id> - put text with its name (or id)\n| !list - list of saved vars\n| !np - show that you are listening to \n| !bot - output session statistics\n| !translate [language/langs] - by sending a reply to a message, it will translate it into the selected language\n| !v2t - translation of a voice message into text\n| !console [cmd] - use the console (if enabled)\n| !!off [bot/pc/pc.kill] - turn off the bot/computer/computer quickly\nL [NEW]!morse to/from [text] - translate in Morse code (you can send in response to a message without specifying the text)\n| !crypt [password] [text] - encrypt the message \n| !decrypt [password] [cipher] - decrypt the interlocutor\'s message, you can send a response \n| !spam [number] [message] - spam the specified number of messages with text\n| !joke - send a joke\n|[NEW] !cat - send a random picture of a cat\n|[NEW] !neko - send a random picture\n| [NEW] !pic [nature/city/technology/food/still_life/abstract/wildlife] - send a random picture by category\n|[NEW] !njoke - send a joke (ninja api)\n| [NEW] !dadjoke - send a father\'s joke (ninja api)\nL [NEW] !fact - random fact (ninja api)\n'
     if lng == '1':
+        print(text)
         print(eng)
         print(ln(30))
         if chints == '1':
@@ -868,6 +878,7 @@ def help():
         print(ln(12))
         return eng
     elif lng == '2':
+        print(text)
         print(rus)
         print(ln(30))
         if chints == '1':
@@ -875,5 +886,6 @@ def help():
         print(ln(12))
         return rus
     print(v)
+
 help()
 client.run()

