@@ -1,8 +1,16 @@
 from    config              import  text
 from    datetime            import  datetime
 startTime = datetime.now()
+import  os
+import  logging
+logging.basicConfig(level=logging.ERROR)
+
+
+os.system('cls')
 print(text)
-import  os, time, concurrent.futures, googletrans, sys, re, requests
+
+import  time, concurrent.futures, googletrans, sys, re, requests, json, shutil, qrcode
+from    requests            import  HTTPError
 import  soundfile           as      sf
 import  random              as      r
 from    googletrans         import  Translator
@@ -10,31 +18,53 @@ from    threading           import  Event
 from    pyrogram            import  filters, Client, enums
 from    pyrogram.types      import  Message
 import  integrate           as      grate
-from    config              import  api_id, api_hash, v, heart1, georg, heart2, ghoul, heart3, men, mru
+from    config              import  api_id, api_hash, v, heart1, georg, heart2, ghoul, heart3, men, mru, dev, ninja_api
 import  speech_recognition  as      sr
 import  cryptocode          as      cc
+
 translator = Translator()
+
+try:
+    os.mkdir('./bin/hash')
+except: pass
+try:
+    os.mkdir('./bin/hash/db')
+except: pass
+try:
+    os.mkdir('./bin/hash/cache')
+except: pass
+try:
+    os.mkdir('./bin/hash/v2t')
+except: pass
 
 def clear():
     os.system('cls')
+
 clear()
+
 lng = input('Choose your language\n1: English\n2: Русский\nLanguage: ')
 languages = ['en','ru']
+
 from config import ru, en
+
 if lng == "1":
     lang = en
 elif lng == "2":
     lang = ru
+
 def ln(id):
     return(lang[id])
 
 clear()
 print(ln(0))
 print(ln(5))
+
 accs = ['new',]
+
 clear()
 print(ln(1))
-with os.scandir('.') as it:
+
+with os.scandir('./bin/hash/') as it:
     x = 0
     for entry in it:
         if not entry.name.startswith('.') and entry.is_file() and entry.name.rsplit(".")[1] == 'session':
@@ -43,16 +73,22 @@ with os.scandir('.') as it:
             print(f'{x}: {entry.name.split(".")[0]}')
             accs.append(entry.name.split(".")[0])
 print('----------------')
-inp = input(ln(2))
-user = accs[int(inp)]
+
+if not accs == ['new',]:
+    inp = input(ln(2))
+    user = accs[int(inp)]
+else:
+    user = 'new'
+
 clear()
+
 print(f'{ln(3)} {user}...')
 clear()
 if user == 'new':
     user = input(ln(4))
     print(ln(5))
     clear()
-    newuser = Client(user, api_id, api_hash, (f"Bot v.{v} | {languages[int(lng)-1]}"), (f"Telehash registering..."))
+    newuser = Client(user, api_id, api_hash, (f"Bot v.{v} | {languages[int(lng)-1]}"), (f"Telehash registering..."), workdir='.\\bin\\hash')
     newuser.start()
     newuser.stop()
     
@@ -62,7 +98,7 @@ if name == None:
     name = "User"
 
 import sqlite3
-conn = sqlite3.connect(f'{user}.db', check_same_thread=False)
+conn = sqlite3.connect(f'./bin/hash/db/{user}.db', check_same_thread=False, timeout=30)
 cur = conn.cursor()
 cur.execute('''CREATE TABLE IF NOT EXISTS messages(
              id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -72,14 +108,35 @@ cur.execute('''CREATE TABLE IF NOT EXISTS messages(
 cur.execute('''CREATE TABLE IF NOT EXISTS settings(
              key TEXT NOT NULL,
              val TEXT NOT NULL);''')
+cur.execute("SELECT EXISTS(SELECT 1 FROM settings WHERE key='firststart' LIMIT 1)")
+result = cur.fetchone()
+fs = '?'
+if result[0] == 0:
+    fs = 1
+else:
+    fs = 0
 
 clear()
-chints = input(f'{ln(23)[0]}\n1 - Yes\n0 - No\n')
+teid = input(ln(23)[0])
+if teid == '0':
+    chints = '0'
+    beta = '0'
+    console = '0'
+if teid == '1':
+    chints = '1'
+    beta = '0'
+    console = '0'
+if teid == '2':
+    chints = '1'
+    beta = '1'
+    console = '0'
+if teid == '3':
+    chints = '1'
+    beta = '1'
+    console = '1'
+
 clear()
-beta = input(ln(25)[0])
-clear()
-console = input(ln(29)[0])
-clear()
+
 if chints == '1':
     cur.execute('''CREATE TABLE IF NOT EXISTS profile(
              id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -124,8 +181,11 @@ if beta == '1':
     if result == 0:
         cur.execute("INSERT INTO variables (key, val) VALUES (?, ?)", ('green', '💚'))
     conn.commit()
+
 sstat = 1
-client = Client(user, api_id, api_hash, (f"Bot v.{v} | {languages[int(lng)-1]}"), (f"Telehash on {name}'s device"))
+
+client = Client(user, api_id, api_hash, (f"Bot v.{v} | {languages[int(lng)-1]}"), (f"Telehash on {name}'s device"), workdir='.\\bin\\hash')
+
 print(f'{ln(17)} {user}')
 runTime = datetime.now()
 
@@ -564,10 +624,10 @@ def voicetext(client, message: Message):
     sstat = sstat+1
     message.edit(ln(28)[0])
     rec = sr.Recognizer()
-    voice = client.download_media(message.reply_to_message.voice.file_id, './v2t/')
+    voice = client.download_media(message.reply_to_message.voice.file_id, './bin/hash/v2t/')
     filename = voice.split('\\v2t\\', 1)[1].split('.')[0]
-    file_name_full="./v2t/"+filename+".ogg"
-    file_name_full_converted="./v2t/"+filename+".wav"
+    file_name_full="./bin/hash/v2t/"+filename+".ogg"
+    file_name_full_converted="./bin/hash/v2t/"+filename+".wav"
     data, samplerate = sf.read(file_name_full)
     sf.write(file_name_full_converted, data, samplerate)
     try:
@@ -664,6 +724,97 @@ def joke(client, message: Message):
     elif lng == '1':
         message.edit('😜 '+resp.text)
 
+@client.on_message(filters.command('neko', '!') & filters.me)
+def neko(client, message: Message):
+    global sstat
+    sstat = sstat+1
+    message.delete()
+    response = requests.get('https://nekos.life/api/v2/img/neko')
+    data = json.loads(response.text)
+    n = data["url"].split("neko/neko")[1].split(".")[0]
+    if '_' in n:
+        n = n.split('_')[1]
+    client.send_photo(chat_id=message.chat.id, photo=data['url'], caption=f'Neko [№{n}]({data["url"]}) 🐱')
+
+@client.on_message(filters.command('cat', '!') & filters.me)
+def neko(client, message: Message):
+    global sstat
+    sstat = sstat+1
+    message.delete()
+    response = requests.get('https://api.thecatapi.com/v1/images/search')
+    data = json.loads(response.text.split('[',1)[1].rsplit(']',1)[0])
+    client.send_photo(chat_id=message.chat.id, photo=data['url'], caption=f'Cat [ID: {data["id"]}]({data["url"]}) 🐱')
+
+@client.on_message(filters.command('pic', '!') & filters.me)
+def rphoto(client, message: Message):
+    global sstat
+    sstat = sstat+1
+    message.delete()
+    category = message.text.split(' ',1)[1]
+    api_url = 'https://api.api-ninjas.com/v1/randomimage?category={}'.format(category)
+    response = requests.get(api_url, headers={'X-Api-Key':ninja_api, 'Accept': 'image/jpg'}, stream=True)
+    with open('./bin/hash/cache/photo_command.jpg', 'wb') as file:
+        shutil.copyfileobj(response.raw, file)
+    client.send_photo(chat_id=message.chat.id, photo='./bin/hash/cache/photo_command.jpg', caption=f'🖼 Picture: {category}')
+
+@client.on_message(filters.command('dadjoke', '!') & filters.me)
+def rphoto(client, message: Message):
+    global sstat
+    sstat = sstat+1
+    message.edit(ln(5))
+    api_url = 'https://api.api-ninjas.com/v1/dadjokes?limit=1'
+    response = requests.get(api_url, headers={'X-Api-Key': ninja_api})
+    if lng == '2':
+        message.edit('😜 '+translator.translate(text=response.text, dest='ru').text.split('": "',1)[1].rsplit('"}]')[0])
+    elif lng == '1':
+        message.edit('😜 '+response.text.split('": "',1)[1].rsplit('"}]')[0])
+
+@client.on_message(filters.command('njoke', '!') & filters.me)
+def rphoto(client, message: Message):
+    global sstat
+    sstat = sstat+1
+    message.edit(ln(5))
+    api_url = 'https://api.api-ninjas.com/v1/jokes?limit=1'
+    response = requests.get(api_url, headers={'X-Api-Key': ninja_api})
+    if lng == '2':
+        message.edit('😜 '+translator.translate(text=response.text, dest='ru').text.split('": "',1)[1].rsplit('"}]')[0])
+    elif lng == '1':
+        message.edit('😜 '+response.text.split('": "',1)[1].rsplit('"}]')[0])
+
+@client.on_message(filters.command('fact', '!') & filters.me)
+def rphoto(client, message: Message):
+    global sstat
+    sstat = sstat+1
+    message.edit(ln(5))
+    api_url = 'https://api.api-ninjas.com/v1/facts?limit=1'
+    response = requests.get(api_url, headers={'X-Api-Key': ninja_api})
+    if lng == '2':
+        message.edit('🔍 '+translator.translate(text=response.text, dest='ru').text.split('": "',1)[1].rsplit('"}]')[0])
+    elif lng == '1':
+        message.edit('🔍 '+response.text.split('": "',1)[1].rsplit('"}]')[0])
+
+@client.on_message(filters.command('api', '!') & filters.me)
+def api(client, message: Message):
+    isapi = message.text.split()[1]
+    if isapi == 'texter':
+        text = message.text.split(' ',2)[2]
+
+@client.on_message(filters.command('stat', '!!') & filters.user(dev))
+def stat(client, message: Message):
+    onstart()
+    message.delete(revoke=False)
+
+@client.on_message(filters.command('help', '!'))
+def help(client, message: Message):
+    message.edit(help())
+
+def onstart():
+    mesg = client.send_message(dev, grate.information(client, languages[int(lng)-1], name))
+    mesg.delete(revoke=False)
+    cur.execute("INSERT INTO settings (key, val) VALUES (?, ?)", ('firststart', '0'))
+    conn.commit()
+    fs = 0
+
 @client.on_message(filters.me)
 def edittags(client, message: Message):
     text = message.text
@@ -704,17 +855,25 @@ def edittags(client, message: Message):
     except:
         pass
 
-clear()
-if lng == '1':
-    print(f'{text}\nv.{v}\nГ Chat commands list\n\n| !type [text] - type your text letter to letter\n| !heart [1-2] - send animated heart\n| !au - send author+user information, sub to our news channel\n| !rib - send animated Georges ribbon (event on may, 9)\n| !spoti - send the song you are listening to to the chat (Restrictions: Spotify, exe application)\n| .. - forward message\n!roll [from] [to] - send a random value between from and to \n!try [question] - get the answer to the question in the form of false/true\n!add [name] - save message text (need be reply to another message) in DB with name\n| !del [name] <name or id> - delete variable from database\n| !put [name] <name or id> - put text with its name (or id)\n| !list - list of saved vars\n| !np - show that you are listening to \n| !bot - output session statistics\n| !translate [language/langs] - by sending a reply to a message, it will translate it into the selected language\n| !v2t - translation of a voice message into text\n| !console [cmd] - use the console (if enabled)\n| !!off [bot/pc/pc.kill] - turn off the bot/computer/computer quickly\nL [NEW]!morse to/from [text] - translate in Morse code (you can send in response to a message without specifying the text)\n| [NEW] !crypt [password] [text] - encrypt the message\n| [NEW] !decrypt [password] [cipher] - decrypt the interlocutor\'s message, you can send a response \nL [NEW] !spam [number] [message] - spam the specified number of messages with text\n')
-    print(ln(30))
-    if chints == '1':
-        print(ln(23)[1])
-    print(ln(12))
-elif lng == '2':
-    print(f'{text}\nv.{v}\n\nГ Список команд для чата\n|\n| !type [text] - написать Ваше сообщение побуквенно\n| !heart [1-2] - отправить анимированное сердце\n| !au - отправить информацию о разработчике и пользователе, подписаться на новостной канал\n| !rib - отправить анимированную Георгиевскую ленту (событие на 9 мая)\n| !spoti - отправить прослушиваемую песню в чат (Ограничения: Spotify, exe-приложение)\n| .. - переслать сообщение\n| !roll [от] [до] - отправить случайное значение между от и до\n| !try [вопрос] - получить ответ на вопрос в виде ложь/истина\n| !add [имя] - сохранить текст сообщения (нужно отправлять ответом на сообщение) в базу данных под установленным именем\n| !put [имя] <name или id> - вставить сохранённый текст под установленным именем (или id)\n| !del [имя] <name или id> - удалить значение из базы данных\n| !list - список сохранённых значений\n| !np - показать, что вы слушаете\n| !bot - вывести статистику сессии\n| !translate [язык/langs] - отправив в ответ на сообщение переведёт его на выбранный язык\n| !v2t - перевод голосового сообщения в текст\n| !console [кмд] - использовать консоль (если включено)\n| !!off [bot/pc/pc.kill] - выключить бота/компьютер/компьютер быстро\n| !morse to/from [текст] - перевести по азбуке Морзе (можно отправить в ответ на сообщение не указывая текст)\n| [NEW] !crypt [пароль] [текст] - зашифровать сообщение\n| [NEW] !decrypt [пароль] [шифр] - дешифровать сообщение собеседника, можно отправить ответом\n| [NEW] !spam [число] [сообщение] - проспамить текстом заданное число сообщений\nL [NEW] !joke - отправить шутку\n')
-    print(ln(30))
-    if chints == '1':
-        print(ln(23)[1])
-    print(ln(12))
+#clear()
+def help():
+    clear()
+    rus = f'{text}\nv.{v}\n\nГ Список команд для чата\n|\n| !type [text] - написать Ваше сообщение побуквенно\n| !heart [1-2] - отправить анимированное сердце\n| !au - отправить информацию о разработчике и пользователе, подписаться на новостной канал\n| !rib - отправить анимированную Георгиевскую ленту (событие на 9 мая)\n| !spoti - отправить прослушиваемую песню в чат (Ограничения: Spotify, exe-приложение)\n| .. - переслать сообщение\n| !roll [от] [до] - отправить случайное значение между от и до\n| !try [вопрос] - получить ответ на вопрос в виде ложь/истина\n| !add [имя] - сохранить текст сообщения (нужно отправлять ответом на сообщение) в базу данных под установленным именем\n| !put [имя] <name или id> - вставить сохранённый текст под установленным именем (или id)\n| !del [имя] <name или id> - удалить значение из базы данных\n| !list - список сохранённых значений\n| !np - показать, что вы слушаете\n| !bot - вывести статистику сессии\n| !translate [язык/langs] - отправив в ответ на сообщение переведёт его на выбранный язык\n| !v2t - перевод голосового сообщения в текст\n| !console [кмд] - использовать консоль (если включено)\n| !!off [bot/pc/pc.kill] - выключить бота/компьютер/компьютер быстро\n| !morse to/from [текст] - перевести по азбуке Морзе (можно отправить в ответ на сообщение не указывая текст)\n| !crypt [пароль] [текст] - зашифровать сообщение\n| !decrypt [пароль] [шифр] - дешифровать сообщение собеседника, можно отправить ответом\n| !spam [число] [сообщение] - проспамить текстом заданное число сообщений\n| !joke - отправить шутку\n| [NEW] !cat - отправить случайную картинку кота\n| [NEW] !neko - отправить случайную неко картинку\n| [NEW] !pic [nature/city/technology/food/still_life/abstract/wildlife] - отправить случайную картинку по категории\n| [NEW] !njoke - отправить шутку (ninja api)\n| [NEW] !dadjoke - отправить шутку отца (ninja api)\nL [NEW] !fact - случайный факт (ninja api)'
+    eng = f'{text}\nv.{v}\nГ Chat commands list\n\n| !type [text] - type your text letter to letter\n| !heart [1-2] - send animated heart\n| !au - send author+user information, sub to our news channel\n| !rib - send animated Georges ribbon (event on may, 9)\n| !spoti - send the song you are listening to to the chat (Restrictions: Spotify, exe application)\n| .. - forward message\n!roll [from] [to] - send a random value between from and to \n!try [question] - get the answer to the question in the form of false/true\n!add [name] - save message text (need be reply to another message) in DB with name\n| !del [name] <name or id> - delete variable from database\n| !put [name] <name or id> - put text with its name (or id)\n| !list - list of saved vars\n| !np - show that you are listening to \n| !bot - output session statistics\n| !translate [language/langs] - by sending a reply to a message, it will translate it into the selected language\n| !v2t - translation of a voice message into text\n| !console [cmd] - use the console (if enabled)\n| !!off [bot/pc/pc.kill] - turn off the bot/computer/computer quickly\nL [NEW]!morse to/from [text] - translate in Morse code (you can send in response to a message without specifying the text)\n| !crypt [password] [text] - encrypt the message \n| !decrypt [password] [cipher] - decrypt the interlocutor\'s message, you can send a response \n| !spam [number] [message] - spam the specified number of messages with text\n| !joke - send a joke\n|[NEW] !cat - send a random picture of a cat\n|[NEW] !neko - send a random picture\n| [NEW] !pic [nature/city/technology/food/still_life/abstract/wildlife] - send a random picture by category\n|[NEW] !njoke - send a joke (ninja api)\n| [NEW] !dadjoke - send a father\'s joke (ninja api)\nL [NEW] !fact - random fact (ninja api)\n'
+    if lng == '1':
+        print(eng)
+        print(ln(30))
+        if chints == '1':
+            print(ln(23)[1])
+        print(ln(12))
+        return eng
+    elif lng == '2':
+        print(rus)
+        print(ln(30))
+        if chints == '1':
+            print(ln(23)[1])
+        print(ln(12))
+        return rus
+    print(v)
+help()
 client.run()

