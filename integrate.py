@@ -2,6 +2,7 @@ import win32gui, psutil, win32process
 import random as r
 import platform
 from config import *
+from secret import *
 import requests
 
 def spotify():
