@@ -2,27 +2,24 @@ from    config              import  text
 from    datetime            import  datetime
 startTime = datetime.now()
 import  os
-import  logging
-logging.basicConfig(level=logging.ERROR)
 
 os.system('cls')
 print(text)
 
-import  time, concurrent.futures, googletrans, sys, re, requests, json, shutil, qrcode, wmi
+import  time, concurrent.futures, sys, re, requests, json, shutil, qrcode, wmi
 from    requests            import  HTTPError
 import  soundfile           as      sf
 import  random              as      r
-from    googletrans         import  Translator
 from    threading           import  Event
 from    pyrogram            import  filters, Client, enums
 from    pyrogram.types      import  Message
 import  integrate           as      grate
 from    config              import  *
 from    secret              import  *
-import  speech_recognition  as      sr
 import  cryptocode          as      cc
+import  openai
 
-translator = Translator()
+openai.api_key = openai_key
 
 try:
     os.mkdir('./bin/hash')
@@ -612,27 +609,29 @@ def botstat(client, message: Message):
     sstat = sstat+1
     message.edit(f'{ln(27)[0]}{str(datetime.now() - runTime).split(".")[0]} / {str(datetime.now() - startTime).split(".")[0]}\n{ln(27)[1]}{str(sstat)}\n{v}')
 
+def aitrans(prompt):
+    engine = "gpt-3.5-turbo"
+    tolang = 'ru'
+    completion = openai.ChatCompletion.create(model=engine, messages=[{"role": "system", "content": f"You are a language translator, and you answer ONLY with the translated text of the request on {tolang}"},{"role": "user", "content": prompt}], temperature=0.7, max_tokens=2000)
+
 @client.on_message(filters.command('translate', '!')) #  & filters.me
-def translate(client, message: Message):
-    global sstat
-    sstat = sstat+1
-    if message.text.split()[1] == 'langs':
-        a = ''
-        for short, long in googletrans.LANGUAGES.items():
-            a = a+long.capitalize()+' - '+short+'\n'
-        message.edit(a)
-    result = translator.translate(text=message.reply_to_message.text, dest=message.text.split()[1])
-    try:
-        message.edit(f'{googletrans.LANGUAGES[result.src].capitalize()} -> {googletrans.LANGUAGES[message.text.split()[1]].capitalize()}\n{result.text}')
-    except:
-        client.send_message(message.chat.id, f'{googletrans.LANGUAGES[result.src].capitalize()} -> {googletrans.LANGUAGES[message.text.split()[1]].capitalize()}\n{result.text}')
+def translate(client:Client, message:Message):
+    message.edit(ln(31)[0])
+    engine="gpt-3.5-turbo"
+    mesg = message.text.split(' ',2)
+    tolang = mesg[1]
+    prompt = mesg[2]
+    if message.reply_to_message.text:
+        prompt = message.reply_to_message.text
+    completion = openai.ChatCompletion.create(model=engine, messages=[{"role": "system", "content": f"You are a language translator, and you answer ONLY with the translated text of the request on {tolang}"},{"role": "user", "content": prompt}], temperature=0.7, max_tokens=2000)
+    reply = completion.choices[0]["message"]["content"].replace("'", "```")
+    message.edit(f'🌐: {reply}\n\n⪼ {prompt}', parse_mode=enums.ParseMode.MARKDOWN)
 
 @client.on_message(filters.command('v2t', '!') & filters.me)
 def voicetext(client, message: Message):
     global sstat
     sstat = sstat+1
     message.edit(ln(28)[0])
-    rec = sr.Recognizer()
     voice = client.download_media(message.reply_to_message.voice.file_id, './bin/hash/v2t/')
     filename = voice.split('\\v2t\\', 1)[1].split('.')[0]
     file_name_full="./bin/hash/v2t/"+filename+".ogg"
@@ -640,10 +639,11 @@ def voicetext(client, message: Message):
     data, samplerate = sf.read(file_name_full)
     sf.write(file_name_full_converted, data, samplerate)
     try:
-        with sr.AudioFile(file_name_full_converted) as source:
-            audio_text = rec.listen(source)
-            text = ln(28)[1]+rec.recognize_google(audio_text,language='ru_RU')
-            message.edit(text)
+        media_file = open(file_name_full_converted, 'rb')
+        response = openai.Audio.transcribe(api_key=openai_key, model='whisper-1', file=media_file, prompt='')
+        text = ln(28)[1]+response['text']
+        media_file.close()
+        message.edit(text)
     except:
         message.edit(ln(28)[2])
     os.remove(file_name_full)
@@ -729,7 +729,7 @@ def joke(client, message: Message):
     sstat = sstat+1
     resp = requests.get('https://v2.jokeapi.dev/joke/Dark?format=txt')
     if lng == '2':
-        message.edit('😜 '+translator.translate(text=resp.text, dest='ru').text)
+        message.edit('😜 '+aitrans(resp.text))
     elif lng == '1':
         message.edit('😜 '+resp.text)
 
@@ -774,7 +774,7 @@ def rphoto(client, message: Message):
     api_url = 'https://api.api-ninjas.com/v1/dadjokes?limit=1'
     response = requests.get(api_url, headers={'X-Api-Key': ninja_api})
     if lng == '2':
-        message.edit('😜 '+translator.translate(text=response.text, dest='ru').text.split('": "',1)[1].rsplit('"}]')[0])
+        message.edit('😜 '+aitrans(response.text).split('": "',1)[1].rsplit('"}]')[0])
     elif lng == '1':
         message.edit('😜 '+response.text.split('": "',1)[1].rsplit('"}]')[0])
 
@@ -786,7 +786,7 @@ def rphoto(client, message: Message):
     api_url = 'https://api.api-ninjas.com/v1/jokes?limit=1'
     response = requests.get(api_url, headers={'X-Api-Key': ninja_api})
     if lng == '2':
-        message.edit('😜 '+translator.translate(text=response.text, dest='ru').text.split('": "',1)[1].rsplit('"}]')[0])
+        message.edit('😜 '+aitrans(response.text).split('": "',1)[1].rsplit('"}]')[0])
     elif lng == '1':
         message.edit('😜 '+response.text.split('": "',1)[1].rsplit('"}]')[0])
 
@@ -798,7 +798,7 @@ def rphoto(client, message: Message):
     api_url = 'https://api.api-ninjas.com/v1/facts?limit=1'
     response = requests.get(api_url, headers={'X-Api-Key': ninja_api})
     if lng == '2':
-        message.edit('🔍 '+translator.translate(text=response.text, dest='ru').text.split('": "',1)[1].rsplit('"}]')[0])
+        message.edit('🔍 '+aitrans(response.text).split('": "',1)[1].rsplit('"}]')[0])
     elif lng == '1':
         message.edit('🔍 '+response.text.split('": "',1)[1].rsplit('"}]')[0])
 
@@ -826,6 +826,16 @@ def stat(client, message: Message):
 @client.on_message(filters.command('help', '!'))
 def help(client, message: Message):
     message.edit(help())
+
+@client.on_message(filters.command('gpt', '!') & filters.me)
+def gpt(client, message: Message):
+    message.edit(ln(31)[0])
+    engine="gpt-3.5-turbo"
+    prompt = message.text.split(' ',1)[1]
+    completion = openai.ChatCompletion.create(model=engine, messages=[{"role": "user", "content": prompt}], temperature=0.7, max_tokens=2000)
+    reply = completion.choices[0]["message"]["content"].replace("'", "```")
+    message.edit(f'🤖: {reply}\n\n❓: {prompt}', parse_mode=enums.ParseMode.MARKDOWN)
+    return reply
 
 def onstart(message):
     mesg = message.reply(info)
@@ -877,8 +887,8 @@ def edittags(client, message: Message):
 #clear()
 def help():
     clear()
-    rus = f'v.{v}\n\n╔ Список команд для чата\n║\n╠ !type [text] - написать Ваше сообщение побуквенно\n╠ !heart [1-2] - отправить анимированное сердце\n╠ !au - отправить информацию о разработчике и пользователе, подписаться на новостной канал\n╠ !rib - отправить анимированную Георгиевскую ленту (событие на 9 мая)\n╠ !spoti - отправить прослушиваемую песню в чат (Ограничения: Spotify, exe-приложение)\n╠ .. - переслать сообщение\n╠ !roll [от] [до] - отправить случайное значение между от и до\n╠ !try [вопрос] - получить ответ на вопрос в виде ложь/истина\n╠ !add [имя] - сохранить текст сообщения (нужно отправлять ответом на сообщение) в базу данных под установленным именем\n╠ !put [имя] <name или id> - вставить сохранённый текст под установленным именем (или id)\n╠ !del [имя] <name или id> - удалить значение из базы данных\n╠ !list - список сохранённых значений\n╠ !np - показать, что вы слушаете\n╠ !bot - вывести статистику сессии\n╠ !translate [язык/langs] - отправив в ответ на сообщение переведёт его на выбранный язык\n╠ !v2t - перевод голосового сообщения в текст\n╠ !console [кмд] - использовать консоль (если включено)\n╠ !!off [bot/pc/pc.kill] - выключить бота/компьютер/компьютер быстро\n╠ !morse to/from [текст] - перевести по азбуке Морзе (можно отправить в ответ на сообщение не указывая текст)\n╠ !crypt [пароль] [текст] - зашифровать сообщение\n╠ !decrypt [пароль] [шифр] - дешифровать сообщение собеседника, можно отправить ответом\n╠ !spam [число] [сообщение] - проспамить текстом заданное число сообщений\n╠ !joke - отправить шутку\n╠ [NEW] !cat - отправить случайную картинку кота\n╠ [NEW] !neko - отправить случайную неко картинку\n╠ [NEW] !pic [nature/city/technology/food/still_life/abstract/wildlife] - отправить случайную картинку по категории\n╠ [NEW] !njoke - отправить шутку (ninja api)\n╠ [NEW] !dadjoke - отправить шутку отца (ninja api)\n╚ [NEW] !fact - случайный факт (ninja api)'
-    eng = f'v.{v}\n╔ Chat commands list\n║\n╠ !type [text] - type your text letter to letter\n╠ !heart [1-2] - send animated heart\n╠ !au - send author+user information, sub to our news channel\n╠ !rib - send animated Georges ribbon (event on may, 9)\n╠ !spoti - send the song you are listening to to the chat (Restrictions: Spotify, exe application)\n╠ .. - forward message\n!roll [from] [to] - send a random value between from and to \n!try [question] - get the answer to the question in the form of false/true\n!add [name] - save message text (need be reply to another message) in DB with name\n╠ !del [name] <name or id> - delete variable from database\n╠ !put [name] <name or id> - put text with its name (or id)\n╠ !list - list of saved vars\n╠ !np - show that you are listening to \n╠ !bot - output session statistics\n╠ !translate [language/langs] - by sending a reply to a message, it will translate it into the selected language\n╠ !v2t - translation of a voice message into text\n╠ !console [cmd] - use the console (if enabled)\n╠ !!off [bot/pc/pc.kill] - turn off the bot/computer/computer quickly\nL [NEW]!morse to/from [text] - translate in Morse code (you can send in response to a message without specifying the text)\n╠ !crypt [password] [text] - encrypt the message \n╠ !decrypt [password] [cipher] - decrypt the interlocutor\'s message, you can send a response \n╠ !spam [number] [message] - spam the specified number of messages with text\n╠ !joke - send a joke\n╠[NEW] !cat - send a random picture of a cat\n╠[NEW] !neko - send a random picture\n╠ [NEW] !pic [nature/city/technology/food/still_life/abstract/wildlife] - send a random picture by category\n╠[NEW] !njoke - send a joke (ninja api)\n╠ [NEW] !dadjoke - send a father\'s joke (ninja api)\n╚ [NEW] !fact - random fact (ninja api)\n'
+    rus = f'v.{v}\n\n╔ Список команд для чата\n║\n╠ !type [text] - написать Ваше сообщение побуквенно\n╠ !heart [1-2] - отправить анимированное сердце\n╠ !au - отправить информацию о разработчике и пользователе, подписаться на новостной канал\n╠ !rib - отправить анимированную Георгиевскую ленту (событие на 9 мая)\n╠ !spoti - отправить прослушиваемую песню в чат (Ограничения: Spotify, exe-приложение)\n╠ .. - переслать сообщение\n╠ !roll [от] [до] - отправить случайное значение между от и до\n╠ !try [вопрос] - получить ответ на вопрос в виде ложь/истина\n╠ !add [имя] - сохранить текст сообщения (нужно отправлять ответом на сообщение) в базу данных под установленным именем\n╠ !put [имя] <name или id> - вставить сохранённый текст под установленным именем (или id)\n╠ !del [имя] <name или id> - удалить значение из базы данных\n╠ !list - список сохранённых значений\n╠ !np - показать, что вы слушаете\n╠ !bot - вывести статистику сессии\n╠ !console [кмд] - использовать консоль (если включено)\n╠ !!off [bot/pc/pc.kill] - выключить бота/компьютер/компьютер быстро\n╠ !morse to/from [текст] - перевести по азбуке Морзе (можно отправить в ответ на сообщение не указывая текст)\n╠ !crypt [пароль] [текст] - зашифровать сообщение\n╠ !decrypt [пароль] [шифр] - дешифровать сообщение собеседника, можно отправить ответом\n╠ !spam [число] [сообщение] - проспамить текстом заданное число сообщений\n╠ !joke - отправить шутку\n╠ !cat - отправить случайную картинку кота\n╠ !neko - отправить случайную неко картинку\n╠ !pic [nature/city/technology/food/still_life/abstract/wildlife] - отправить случайную картинку по категории\n╠ !njoke - отправить шутку (ninja api)\n╠ !dadjoke - отправить шутку отца (ninja api)\n╠ !fact - случайный факт (ninja api)\n╚ !qr [текст] - сгенерировать QR-код\n╔ OpenAI\n╠ !gpt [вопрос] - задать вопрос ChatGPT\n╠ !translate [язык] <текст> - отправив в ответ на сообщение переведёт его на выбранный язык\n╚ !v2t - нейроперевод голосового сообщения в текст\n'
+    eng = f'v.{v}\n╔ Chat commands list\n║\n╠ !type [text] - type your text letter to letter\n╠ !heart [1-2] - send animated heart\n╠ !au - send author+user information, sub to our news channel\n╠ !rib - send animated Georges ribbon (event on may, 9)\n╠ !spoti - send the song you are listening to to the chat (Restrictions: Spotify, exe application)\n╠ .. - forward message\n!roll [from] [to] - send a random value between from and to \n!try [question] - get the answer to the question in the form of false/true\n!add [name] - save message text (need be reply to another message) in DB with name\n╠ !del [name] <name or id> - delete variable from database\n╠ !put [name] <name or id> - put text with its name (or id)\n╠ !list - list of saved vars\n╠ !np - show that you are listening to \n╠ !bot - output session statistics\n╠ !translate [language/langs] - by sending a reply to a message, it will translate it into the selected language\n╠ !v2t - translation of a voice message into text\n╠ !console [cmd] - use the console (if enabled)\n╠ !!off [bot/pc/pc.kill] - turn off the bot/computer/computer quickly\nL!morse to/from [text] - translate in Morse code (you can send in response to a message without specifying the text)\n╠ !crypt [password] [text] - encrypt the message \n╠ !decrypt [password] [cipher] - decrypt the interlocutor\'s message, you can send a response \n╠ !spam [number] [message] - spam the specified number of messages with text\n╠ !joke - send a joke\n !cat - send a random picture of a cat\n !neko - send a random picture\n╠ !pic [nature/city/technology/food/still_life/abstract/wildlife] - send a random picture by category\n !njoke - send a joke (ninja api)\n╠ !dadjoke - send a father\'s joke (ninja api)\n╠ !fact - random fact (ninja api)\n╚ [NEW] !qr [text] - generate QR-code\n'
     if lng == '1':
         print(text)
         print(eng)
