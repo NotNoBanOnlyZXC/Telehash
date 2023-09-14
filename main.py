@@ -7,8 +7,6 @@ os.system('cls')
 print(text)
 
 import  time, concurrent.futures, sys, re, requests, json, shutil, qrcode, wmi
-from    requests            import  HTTPError
-import  soundfile           as      sf
 import  random              as      r
 from    threading           import  Event
 from    pyrogram            import  filters, Client, enums
@@ -39,7 +37,7 @@ def clear():
 
 clear()
 
-lng = input('╔ Choose your language\n╠ 1: English\n╠ 2: Русский\n╚ Language: ')
+lng = input(f'{color.table}╔{color.text} Choose your language\n{color.table}╠{color.choice} 1: English\n{color.table}╠{color.choice} 2: Русский\n{color.table}╚{color.text} Language: ')
 languages = ['en','ru']
 
 from config import ru, en
@@ -67,9 +65,8 @@ with os.scandir('./bin/hash/') as it:
         if not entry.name.startswith('.') and entry.is_file() and entry.name.rsplit(".")[1] == 'session':
             x = x+1
 
-            print(f'╠ {x}: {entry.name.split(".")[0]}')
+            print(f'{color.table}╠{color.choice} {x}: {entry.name.split(".")[0]}')
             accs.append(entry.name.split(".")[0])
-print('╚═══════════════')
 
 if not accs == ['new',]:
     inp = input(ln(2))
@@ -79,13 +76,13 @@ else:
 
 clear()
 
-print(f'{ln(3)} {user}...')
+print(f'{color.succs}{ln(3)} {user}...{color.clear}')
 clear()
 if user == 'new':
     user = input(ln(4))
     print(ln(5))
     clear()
-    newuser = Client(user, api_id, api_hash, (f"Bot v.{v} ╠ {languages[int(lng)-1]}"), (f"Telehash registering..."), workdir='.\\bin\\hash')
+    newuser = Client(user, api_id, api_hash, (f"Bot v.{v} {color.table}╠{color.text} {languages[int(lng)-1]}"), (f"Telehash registering..."), workdir='.\\bin\\hash')
     newuser.start()
     newuser.stop()
     
@@ -181,7 +178,7 @@ if beta == '1':
 
 sstat = 1
 
-client = Client(user, api_id, api_hash, (f"Bot v.{v} ╠ {languages[int(lng)-1]}"), (f"Telehash on {name}'s device"), workdir='.\\bin\\hash')
+client = Client(user, api_id, api_hash, (f"Bot v.{v} {color.table}╠{color.text} {languages[int(lng)-1]}"), (f"Telehash on {name}'s device"), workdir='.\\bin\\hash')
 print(f'{ln(17)} {user}')
 runTime = datetime.now()
 info = ''
@@ -635,11 +632,8 @@ def voicetext(client, message: Message):
     voice = client.download_media(message.reply_to_message.voice.file_id, './bin/hash/v2t/')
     filename = voice.split('\\v2t\\', 1)[1].split('.')[0]
     file_name_full="./bin/hash/v2t/"+filename+".ogg"
-    file_name_full_converted="./bin/hash/v2t/"+filename+".wav"
-    data, samplerate = sf.read(file_name_full)
-    sf.write(file_name_full_converted, data, samplerate)
     try:
-        media_file = open(file_name_full_converted, 'rb')
+        media_file = open(file_name_full, 'rb')
         response = openai.Audio.transcribe(api_key=openai_key, model='whisper-1', file=media_file, prompt='')
         text = ln(28)[1]+response['text']
         media_file.close()
@@ -647,7 +641,6 @@ def voicetext(client, message: Message):
     except:
         message.edit(ln(28)[2])
     os.remove(file_name_full)
-    os.remove(file_name_full_converted)
 
 @client.on_message(filters.command('off', '!!') & filters.me)
 def off(client, message: Message):
@@ -887,8 +880,9 @@ def edittags(client, message: Message):
 #clear()
 def help():
     clear()
-    rus = f'v.{v}\n\n╔ Список команд для чата\n║\n╠ !type [text] - написать Ваше сообщение побуквенно\n╠ !heart [1-2] - отправить анимированное сердце\n╠ !au - отправить информацию о разработчике и пользователе, подписаться на новостной канал\n╠ !rib - отправить анимированную Георгиевскую ленту (событие на 9 мая)\n╠ !spoti - отправить прослушиваемую песню в чат (Ограничения: Spotify, exe-приложение)\n╠ .. - переслать сообщение\n╠ !roll [от] [до] - отправить случайное значение между от и до\n╠ !try [вопрос] - получить ответ на вопрос в виде ложь/истина\n╠ !add [имя] - сохранить текст сообщения (нужно отправлять ответом на сообщение) в базу данных под установленным именем\n╠ !put [имя] <name или id> - вставить сохранённый текст под установленным именем (или id)\n╠ !del [имя] <name или id> - удалить значение из базы данных\n╠ !list - список сохранённых значений\n╠ !np - показать, что вы слушаете\n╠ !bot - вывести статистику сессии\n╠ !console [кмд] - использовать консоль (если включено)\n╠ !!off [bot/pc/pc.kill] - выключить бота/компьютер/компьютер быстро\n╠ !morse to/from [текст] - перевести по азбуке Морзе (можно отправить в ответ на сообщение не указывая текст)\n╠ !crypt [пароль] [текст] - зашифровать сообщение\n╠ !decrypt [пароль] [шифр] - дешифровать сообщение собеседника, можно отправить ответом\n╠ !spam [число] [сообщение] - проспамить текстом заданное число сообщений\n╠ !joke - отправить шутку\n╠ !cat - отправить случайную картинку кота\n╠ !neko - отправить случайную неко картинку\n╠ !pic [nature/city/technology/food/still_life/abstract/wildlife] - отправить случайную картинку по категории\n╠ !njoke - отправить шутку (ninja api)\n╠ !dadjoke - отправить шутку отца (ninja api)\n╠ !fact - случайный факт (ninja api)\n╚ !qr [текст] - сгенерировать QR-код\n╔ OpenAI\n╠ !gpt [вопрос] - задать вопрос ChatGPT\n╠ !translate [язык] <текст> - отправив в ответ на сообщение переведёт его на выбранный язык\n╚ !v2t - нейроперевод голосового сообщения в текст\n'
-    eng = f'v.{v}\n╔ Chat commands list\n║\n╠ !type [text] - type your text letter to letter\n╠ !heart [1-2] - send animated heart\n╠ !au - send author+user information, sub to our news channel\n╠ !rib - send animated Georges ribbon (event on may, 9)\n╠ !spoti - send the song you are listening to to the chat (Restrictions: Spotify, exe application)\n╠ .. - forward message\n!roll [from] [to] - send a random value between from and to \n!try [question] - get the answer to the question in the form of false/true\n!add [name] - save message text (need be reply to another message) in DB with name\n╠ !del [name] <name or id> - delete variable from database\n╠ !put [name] <name or id> - put text with its name (or id)\n╠ !list - list of saved vars\n╠ !np - show that you are listening to \n╠ !bot - output session statistics\n╠ !translate [language/langs] - by sending a reply to a message, it will translate it into the selected language\n╠ !v2t - translation of a voice message into text\n╠ !console [cmd] - use the console (if enabled)\n╠ !!off [bot/pc/pc.kill] - turn off the bot/computer/computer quickly\nL!morse to/from [text] - translate in Morse code (you can send in response to a message without specifying the text)\n╠ !crypt [password] [text] - encrypt the message \n╠ !decrypt [password] [cipher] - decrypt the interlocutor\'s message, you can send a response \n╠ !spam [number] [message] - spam the specified number of messages with text\n╠ !joke - send a joke\n !cat - send a random picture of a cat\n !neko - send a random picture\n╠ !pic [nature/city/technology/food/still_life/abstract/wildlife] - send a random picture by category\n !njoke - send a joke (ninja api)\n╠ !dadjoke - send a father\'s joke (ninja api)\n╠ !fact - random fact (ninja api)\n╚ [NEW] !qr [text] - generate QR-code\n'
+    rus = f'\n{color.table}╔{color.text} Список команд для чата\n{color.table}║{color.text}\n{color.table}╠{color.cmd} !type [text]{color.text} - написать Ваше сообщение побуквенно\n{color.table}╠{color.cmd} !heart [1-2]{color.text} - отправить анимированное сердце\n{color.table}╠{color.cmd} !au{color.text} - отправить информацию о разработчике и пользователе, подписаться на новостной канал\n{color.table}╠{color.cmd} !rib{color.text} - отправить анимированную Георгиевскую ленту (событие на 9 мая)\n{color.table}╠{color.cmd} !spoti{color.text} - отправить прослушиваемую песню в чат (Ограничения: Spotify, exe-приложение)\n{color.table}╠{color.cmd} ..{color.text} - переслать сообщение\n{color.table}╠{color.cmd} !roll [от] [до]{color.text} - отправить случайное значение между от и до\n{color.table}╠{color.cmd} !try [вопрос]{color.text} - получить ответ на вопрос в виде ложь/истина\n{color.table}╠{color.cmd} !add [имя]{color.text} - сохранить текст сообщения (нужно отправлять ответом на сообщение) в базу данных под установленным именем\n{color.table}╠{color.cmd} !put [имя] <name или id>{color.text} - вставить сохранённый текст под установленным именем (или id)\n{color.table}╠{color.cmd} !del [имя] <name или id>{color.text} - удалить значение из базы данных\n{color.table}╠{color.cmd} !list{color.text} - список сохранённых значений\n{color.table}╠{color.cmd} !np{color.text} - показать, что вы слушаете\n{color.table}╠{color.cmd} !bot{color.text} - вывести статистику сессии\n{color.table}╠{color.cmd} !console [кмд]{color.text} - использовать консоль (если включено)\n{color.table}╠{color.cmd} !!off [bot/pc/pc.kill]{color.text} - выключить бота/компьютер/компьютер быстро\n{color.table}╠{color.cmd} !morse to/from [текст]{color.text} - перевести по азбуке Морзе (можно отправить в ответ на сообщение не указывая текст)\n{color.table}╠{color.cmd} !crypt [пароль] [текст]{color.text} - зашифровать сообщение\n{color.table}╠{color.cmd} !decrypt [пароль] [шифр]{color.text} - дешифровать сообщение собеседника, можно отправить ответом\n{color.table}╠{color.cmd} !spam [число] [сообщение]{color.text} - проспамить текстом заданное число сообщений\n{color.table}╠{color.cmd} !joke{color.text} - отправить шутку\n{color.table}╠{color.cmd} !cat{color.text} - отправить случайную картинку кота\n{color.table}╠{color.cmd} !neko{color.text} - отправить случайную неко картинку\n{color.table}╠{color.cmd} !pic [nature/city/technology/food/still_life/abstract/wildlife]{color.text} - отправить случайную картинку по категории\n{color.table}╠{color.cmd} !njoke{color.text} - отправить шутку (ninja api)\n{color.table}╠{color.cmd} !dadjoke{color.text} - отправить шутку отца (ninja api)\n{color.table}╠{color.cmd} !fact{color.text} - случайный факт (ninja api)\n{color.table}╚{color.cmd} !qr [текст]{color.text} - сгенерировать QR-код\n{color.table}╔ {color.text}OpenAI\n{color.table}╠{color.cmd} !gpt [вопрос]{color.text} - задать вопрос ChatGPT\n{color.table}╠{color.cmd} !translate [язык] <текст>{color.text} - отправив в ответ на сообщение переведёт его на выбранный язык\n{color.table}╚{color.cmd} !v2t{color.text} - нейроперевод голосового сообщения в текст\n'
+
+    eng = f'\n{color.table}╔{color.text} List of chat commands\n{color.table}║{color.text}\n{color.table}╠{color.cmd} !type [text]{color.text} - write your message letter by letter\n{color.table}╠{color.cmd} !heart [1-2]{color.text} - send an animated heart\n{color.table}╠{color.cmd} !au{color.text} - send information about the developer and user, subscribe to the news channel\n{color.table}╠{color.cmd} !rib{color.text} - send an animated St. George ribbon (event on May 9)\n{color.table}╠{color.cmd} !spoti{color.text} - send the song you are listening to to the chat (Restrictions: Spotify, exe application)\n{color.table}╠{color.cmd} ..{color.text} - forward the message\n{color.table}╠{color.cmd} !roll [from] [to]{color.text} - send a random value between from and to\n{color.table}╠{color.cmd} !try [question]{color.text} - get the answer to the question in the form of false/true\n{color.table}╠{color.cmd} !add [name]{color.text} - save the text of the message (you need to send a response to the message) to the database under the specified name\n{color.table}╠{color.cmd} !put [name] <name or id>{color.text} - insert the saved text under the set name (or id)\n{color.table}╠{color.cmd} !del [name] <name or id>{color.text} - delete the value from the database\n{color.table}╠{color.cmd} !list{color.text} - list of saved values\n{color.table}╠{color.cmd} !np{color.text} - show that you are listening\n{color.table}╠{color.cmd} !bot{color.text} - output session statistics\n{color.table}╠{color.cmd} !console [kmd]{color.text} - use the console (if enabled)\n{color.table}╠{color.cmd} !!off [bot/pc/pc.kill]{color.text} - turn off the bot/computer/computer quickly\n{color.table}╠{color.cmd} !morse to/from [text]{color.text} - translate in Morse code (you can send in response to a message without specifying the text)\n{color.table}╠{color.cmd} !crypt [password] [text]{color.text} - encrypt the message\n{color.table}╠{color.cmd} !decrypt [password] [cipher]{color.text} - decrypt the interlocutor\'s message, you can send a response\n{color.table}╠{color.cmd} !spam [number] [message]{color.text} - spam the specified number of messages with text\n{color.table}╠{color.cmd} !joke{color.text} - send a joke\n{color.table}╠{color.cmd} !cat{color.text} - send a random picture of a cat\n{color.table}╠{color.cmd} !neko{color.text} - send a random picture\n{color.table}╠{color.cmd} !pic [nature/city/technology/food/still_life/abstract/wildlife]{color.text} - send a random picture by category\n{color.table}╠{color.cmd} !njoke{color.text} - send a joke (ninja api)\n{color.table}╠{color.cmd} !dadjoke{color.text} - send father\'s joke (ninja api)\n{color.table}╠{color.cmd} !fact{color.text} - random fact (ninja api)\n{color.table}╚{color.cmd} !qr [text]{color.text} - generate QR code\n{color.table}╔ {color.text}OpenAI\n{color.table}╠{color.cmd} !gpt [question]{color.text} - ask a question ChatGPT\n{color.table}╠{color.cmd} !translate [language] <text>{color.text} - by sending a reply to a message, it will translate it into the selected language\n{color.table}╚{color.cmd} !v2t{color.text} - neural translation of a voice message into text\n'
     if lng == '1':
         print(text)
         print(eng)

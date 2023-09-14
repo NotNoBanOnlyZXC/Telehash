@@ -1,36 +1,48 @@
-v = '0.35 Beta' #
+v = '0.35.2 Beta' #══
+
+class color:
+    clear = '\033[0m'
+    header = '\033[01;38;05;196m'
+    white = '\033[01;38;05;15m'
+    cmd = '\033[01;38;05;210m'
+    text = '\033[38;05;224m'
+    error = '\033[01;38;05;196;48;05;52m'
+    succs = '\033[01;38;05;76;48;05;22m'
+    table = '\033[01;38;05;45m'
+    wait = '\033[01;38;05;222m'
+    choice = '\033[01;38;05;174m'
 
 ru = [
-    'Успешно изменено на Русский',
-    '╔══ Аккаунты ═══',
-    'Выберите аккаунт (0 для нового): ',
-    'Входим в ',
-    'Хорошо. Новый аккаунт. Как назовём его?\n',
-    'Подождите...',
-    'Сердцу нужно много шагов для анимации. Шагов: ',
-    '╔ Разработчик: @NoBanOnlyZXC\n╠ Канал: @TelehashDev\n╚ Пользователь:',
+    f'{color.succs}Успешно изменено на Русский{color.clear}',
+    f'{color.table}╔══ {color.text}Аккаунты {color.table}═══',
+    f'{color.table}╚ {color.text}Выберите аккаунт (0 для нового):{color.choice} ',
+    f'{color.wait}Входим в {color.choice}',
+    f'{color.text}Хорошо. Новый аккаунт. Как назовём его?\n{color.choice}',
+    f'{color.wait}Подождите...{color.clear}',
+    f'{color.wait}Шагов анимации: {color.text}',
+    '╔{ Разработчик: @NoBanOnlyZXC\n╠ Канал: @TelehashDev\n╚ Пользователь:',
     'Готово',
-    'Анимируется: Георгиевская лента. Шагов: ',
-    'Георгиевская лента',
+    f'{color.wait}Шагов анимации: {color.text}',
+    '.',
     ['Я слушаю **Spotify**','🎤 **Автор:** ', '🎶 **Песня:** '],
-    '♥ Особая благодарность:\n╔ Amanda\n╠ Ikromax\n╠ NDark\n╚ Fleydi',
+    f'{color.header}♥{color.text} Особая благодарность:\n{color.table}╔{color.text} Amanda\n{color.table}╠{color.text} Ikromax\n{color.table}╠{color.text} NDark\n{color.table}╚{color.text} Fleydi',
     'Переслано от: ',
     'Не обнаружен ID анимации сердца',
     'получил',
     ['⛔ ЛОЖЬ', '✅ ИСТИНА'],
     'Аккаунт:',
-    ['База данных: ', 'Выберите базу данных (0 для новой): ', 'Подключаемся к базе ', 'Напишите название для новой базы данных: '],
+    [],
     ['✅ Сохранено', '❌ Ошибка БД'],
     'Все сохраненные значения',
     ['✅ Удалено', '❌ Ошибка БД'],
     ['Я...', 'Гуль'],
-    ['Принять участие в тестировании новых возможностей?\n 0 - Нет\n 1 - Только важные\n 2 - Beta возможности\n 3 - Все экстра-возможности\n', '╔ !name [list/add/del/int] - изменить настройки имени\n╠ !desc [list/add/del/int] - изменить настройки описания\n╠ !!init - запуск изменений\n╚ !!stop - остановка изменений'], # 23
+    [f'{color.text}Принять участие в тестировании новых возможностей?\n{color.choice} 0 - Нет\n 1 - Только важные\n 2 - Beta возможности\n 3 - Все экстра-возможности\n', f'{color.table}╔{color.text} {color.cmd}!name [list/add/del/int]{color.text} - изменить настройки имени\n{color.table}╠{color.text} {color.cmd}!desc [list/add/del/int]{color.text} - изменить настройки описания\n{color.table}╠ {color.cmd}!!init{color.text} - запуск изменений\n{color.table}╚ {color.cmd}!!stop{color.text} - остановка изменений'], # 23
     ['✅ init запущен\n', '❌ Ошибка БД - не найдены значения (0x01)', '❌ init ошибка! (0x02)'], # 24
-    ['Принять участие в тестировании новых BETA возможностей?\n1 - Да\n0 - Нет\n'],
+    [f'{color.text}Принять участие в тестировании новых BETA возможностей?\n{color.choice}1 - Да\n0 - Нет\n'],
     ['Я слушаю ','🎤 **Артист:** ', '🎶 **Песня:** ', 'Я ничего не слушаю сейчас'], # 26
     ['Юзербот работает сейчас\n⌚ Время работы: ', '⚙ Команд вызвано: '], # 27
     ['🎤 Распознаём голосовое сообщение...', '🎤 Текст: ', '❌ Не удалось перевести голос, попробуйте ещё раз'], # 28
-    ['Включить !console (опасно)\n1 - Да\n0 - Нет\n'],
+    [],
     '''╔ Tag Api
 ╠ {time} - время            {date} - дата
 ╠ {nowartist} - исполнитель {nowname} - название трека
@@ -41,44 +53,44 @@ ru = [
     ['🤖 ChatGPT 3.5 Turbo генерирует ответ...', '🤖 ChatGPT 3.5 Turbo переводит...'] #31
 ]
 en = [
-    'Changed to English',
-    '╔══ Accounts ═══',
-    'Choose account (0 for new): ',
-    'Entering',
-    'Okay. A new account. How to name it?\n',
-    'Wait...',
-    'Heart need many steps to animate. Steps: ',
-    'Г Author: @NoBanOnlyZXC\n╠ Channel: @TelehashDev\nL User:',
+    f'{color.succs}Successfully changed to Russian{color.clear}',
+    f'{color.table}╔══ {color.text}Accounts {color.table}═══',
+    f'{color.table}╚ {color.text}Select an account (0 for a new one):{color.choice} ',
+    f'{color.wait}Entering {color.choice}',
+    f'{color.text} is good. New account. What shall we call it?\n{color.choice}',
+    f'{color.wait}Wait...{color.clear}',
+    f'{color.wait}Animation steps: {color.text}',
+    '╔{ Developer: @NoBanOnlyZXC\n╠ Channel: @TelehashDev\n╚ User:',
     'Done',
-    'Animation: Georges ribbon. Steps: ',
-    'Georges ribbon',
-    ['I`m listening **Spotify** now','🎤 **Author:** ', '🎶 **Song:** '],
-    '♥ Special thanks:\n╔ Amanda\n╠ Ikromax\n╠ NDark\n╚ Fleydi',
+    f'{color.wait}Animation steps: {color.text}',
+    '.',
+    ['I\'m listening to **Spotify**','🎤 **Author:** ', '🎶 **Song:** '],
+    f'{color.header}♥{color.text} Special thanks:\n{color.table}╔{color.text} Amanda\n{color.table}╠{color.text} Ikromax\n{color.table}╠{color.text} NDark\n{color.table}╚{color.text} Fleydi',
     'Forwarded from: ',
-    'Not found ID for heart animation',
-    'rolled',
+    'Heart animation ID not detected',
+    'received',
     ['⛔ FALSE', '✅ TRUE'],
     'Account:',
-    ['Database: ', 'Choose batabase (0 for new): ', 'Connecting to database... ', 'Write a name for database: '],
-    ['✅ Saved', '❌ DB error'],
-    'All saved vars',
-    ['✅ Deleted', '❌ DB error'],
-    ['I`m...', 'Ghoul'],
-    ['Take part in testing new features?\n 0 - No\n 1 - Only important\n 2 - Beta features\n 3 - All extra features\n', '╔ !name [list/add/del/int] - change the name settings \n╠ !desc [list/add/del/int] - change the description settings\n╠ !!init - start changes\n╚ !!stop - stop changes'], # 23
-    ['✅ init started\n', '❌ DB error, not found vars (0x01)', '❌ init error! (0x02)'], # 24
-    ['Take part in testing new BETA features?\n1 - Yes\n0 - No\n'],
-    ['I`m listening ','🎤 **Artist:** ', '🎶 **Song:** ', 'I`m not listening music now'], # 26
-    ['Userbot is working now\n⌚ Working for ', '⚙ Commands triggered: '],
-    ['🎤 Recognizing voice...', '🎤 Text: ', '❌ Error'], # 28
-    ['Enable !console (warning)\n1 - Yes\n0 - No\n'],
-    '''
-    ╔ Tag Api
-    ╠ {time}        {date}
-    ╠ {nowartist}   {nowname}
-    ╠ {phone}       {id}
-    ╠ {chatid}      {ver}
-    ╚ {replyid}     {userid}
-    ''', # 29
+    [],
+    ['✅ Saved', '❌ DB Error'],
+    'All stored values',
+    ['✅ Deleted', '❌ DB Error'],
+    ['I...', 'Ghoul'],
+    [f'{color.text}Take part in testing new features?\n{color.choice} 0 - No\n 1 - Only important\n 2 - Beta features\n 3 - All extra features\n', f'{color.table}╔{color.text} {color.cmd}!name [list/add/del/int]{color.text} - change the name settings\n{color.table}╠{color.text} {color.cmd}!desc [list/add/del/int]{color.text} - change the description settings\n{color.table}╠{color.text} {color.cmd}!!init{color.text} - start changes\n{color.table}╚{color.cmd}!!stop{color.text} - stop changes'], #23
+    ['✅ init started\n', '❌ DB error - no values found (0x01)', '❌ init error! (0x02)'], # 24
+    [f'{color.text}Take part in testing new BETA features?\n{color.choice}1 - Yes\n0 - No\n'],
+    ['I\'m listening','🎤 **Actor:** ', '🎶 **Song:** ', 'I\'m not listening to anything right now'], # 26
+    ['The Telehash is working now\n⌚ Working hours: ', '⚙ Commands called: '], # 27
+    ['🎤 Recognizing voice message...', '🎤 Text: ', '❌ Unable to translate voice, try again'], # 28
+    ['Turn on !console (dangerous)\n1 - Yes\n0 - No\n'],
+    '''╔ Tag Api
+╠ {time} - time          {date} - date
+╠ {nowartist} - artist   {nowname} - track name
+╠ {phone} - phone number {id} - account ID
+╠ {chatid} - chat ID     {ver} - userbot version
+╚ {replyid} - Message ID {userid} - User ID for the message
+''', # 30
+    ['🤖 ChatGPT 3.5 Turbo generates a response...', '🤖 ChatGPT 3.5 Turbo translates...'] #31
 ]
 
 heart1 = [
@@ -312,7 +324,7 @@ ghoul = [
     "I'm so tired of this life"
 ]
 
-text = f'  ████████╗███████╗██╗░░░░░███████╗██╗░░██╗░█████╗░░██████╗██╗░░██╗\n  ╚══██╔══╝██╔════╝██║░░░░░██╔════╝██║░░██║██╔══██╗██╔════╝██║░░██║\n  ░░░██║░░░█████╗░░██║░░░░░█████╗░░███████║███████║╚█████╗░███████║\n  ░░░██║░░░██╔══╝░░██║░░░░░██╔══╝░░██╔══██║██╔══██║░╚═══██╗██╔══██║\n  ░░░██║░░░███████╗███████╗███████╗██║░░██║██║░░██║██████╔╝██║░░██║\n  ░░░╚═╝░░░╚══════╝╚═ {v} ══╝╚═╝░░╚═╝╚═╝░░╚═╝╚═════╝░╚═╝░░╚═╝'
+text = f'{color.header}  ████████╗███████╗██╗     ███████╗██╗  ██╗ █████╗  ██████╗██╗  ██╗\n  ╚══██╔══╝██╔════╝██║     ██╔════╝██║  ██║██╔══██╗██╔════╝██║  ██║\n     ██║   █████╗  ██║     █████╗  ███████║███████║╚█████╗ ███████║\n     ██║   ██╔══╝  ██║     ██╔══╝  ██╔══██║██╔══██║ ╚═══██╗██╔══██║\n     ██║   ███████╗███████╗███████╗██║  ██║██║  ██║██████╔╝██║  ██║\n     ╚═╝   ╚══════╝╚═ {color.white}{v}{color.header} ╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝{color.clear}'
 
 men = { 'A': '.-',     'B': '-...',   'C': '-.-.',
         'D': '-..',    'E': '.',      'F': '..-.',
