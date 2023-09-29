@@ -1,4 +1,4 @@
-v = '0.35.2 Beta' #══
+v = '0.36 Beta' #
 
 class color:
     clear = '\033[0m'
@@ -20,21 +20,21 @@ ru = [
     f'{color.text}Хорошо. Новый аккаунт. Как назовём его?\n{color.choice}',
     f'{color.wait}Подождите...{color.clear}',
     f'{color.wait}Шагов анимации: {color.text}',
-    '╔{ Разработчик: @NoBanOnlyZXC\n╠ Канал: @TelehashDev\n╚ Пользователь:',
+    '╔ Разработчик: @NoBanOnlyZXC\n╠ Канал: @TelehashDev\n╚ Пользователь:',
     'Готово',
     f'{color.wait}Шагов анимации: {color.text}',
     '.',
     ['Я слушаю **Spotify**','🎤 **Автор:** ', '🎶 **Песня:** '],
-    f'{color.header}♥{color.text} Особая благодарность:\n{color.table}╔{color.text} Amanda\n{color.table}╠{color.text} Ikromax\n{color.table}╠{color.text} NDark\n{color.table}╚{color.text} Fleydi',
+    f'{color.header}♥{color.text} Особая благодарность:\n{color.table}╔{color.text} Kira\n{color.table}╠{color.text} Ikromax\n{color.table}╠{color.text} Amanda\n{color.table}╚{color.text} Fleydi',
     'Переслано от: ',
     'Не обнаружен ID анимации сердца',
     'получил',
     ['⛔ ЛОЖЬ', '✅ ИСТИНА'],
     'Аккаунт:',
     [],
-    ['✅ Сохранено', '❌ Ошибка БД'],
-    'Все сохраненные значения',
-    ['✅ Удалено', '❌ Ошибка БД'],
+    ['✅ Сохранено', '❌ Ошибка БД'], # 19
+    'Все сохраненные значения', # 20
+    ['✅ Удалено', '❌ Ошибка БД'], # 21
     ['Я...', 'Гуль'],
     [f'{color.text}Принять участие в тестировании новых возможностей?\n{color.choice} 0 - Нет\n 1 - Только важные\n 2 - Beta возможности\n 3 - Все экстра-возможности\n', f'{color.table}╔{color.text} {color.cmd}!name [list/add/del/int]{color.text} - изменить настройки имени\n{color.table}╠{color.text} {color.cmd}!desc [list/add/del/int]{color.text} - изменить настройки описания\n{color.table}╠ {color.cmd}!!init{color.text} - запуск изменений\n{color.table}╚ {color.cmd}!!stop{color.text} - остановка изменений'], # 23
     ['✅ init запущен\n', '❌ Ошибка БД - не найдены значения (0x01)', '❌ init ошибка! (0x02)'], # 24
@@ -42,7 +42,7 @@ ru = [
     ['Я слушаю ','🎤 **Артист:** ', '🎶 **Песня:** ', 'Я ничего не слушаю сейчас'], # 26
     ['Юзербот работает сейчас\n⌚ Время работы: ', '⚙ Команд вызвано: '], # 27
     ['🎤 Распознаём голосовое сообщение...', '🎤 Текст: ', '❌ Не удалось перевести голос, попробуйте ещё раз'], # 28
-    [],
+    ['Подождите...'], # 29
     '''╔ Tag Api
 ╠ {time} - время            {date} - дата
 ╠ {nowartist} - исполнитель {nowname} - название трека
@@ -50,7 +50,7 @@ ru = [
 ╠ {chatid} - ID чата        {ver} - версия юзербота
 ╚ {replyid} - ID сообщения  {userid} - ID пользователя по сообщению
 ''', # 30
-    ['🤖 ChatGPT 3.5 Turbo генерирует ответ...', '🤖 ChatGPT 3.5 Turbo переводит...'] #31
+    ['🤖 ChatGPT 3.5 Turbo генерирует ответ...', '🤖 ChatGPT 3.5 Turbo переводит...', '⛔ Режим общего GPT отключен.\nПопросите администратора включить эту функцию командой `!gpt +allgpt`', '✅ Режим "allgpt" включен\nВыключить: `!gpt -allgpt`', '✅ Режим "allgpt" выключен\nВключить: `!gpt +allgpt`'] #31
 ]
 en = [
     f'{color.succs}Successfully changed to Russian{color.clear}',
@@ -82,7 +82,7 @@ en = [
     ['I\'m listening','🎤 **Actor:** ', '🎶 **Song:** ', 'I\'m not listening to anything right now'], # 26
     ['The Telehash is working now\n⌚ Working hours: ', '⚙ Commands called: '], # 27
     ['🎤 Recognizing voice message...', '🎤 Text: ', '❌ Unable to translate voice, try again'], # 28
-    ['Turn on !console (dangerous)\n1 - Yes\n0 - No\n'],
+    ['Wait...'],
     '''╔ Tag Api
 ╠ {time} - time          {date} - date
 ╠ {nowartist} - artist   {nowname} - track name
@@ -324,7 +324,7 @@ ghoul = [
     "I'm so tired of this life"
 ]
 
-text = f'{color.header}  ████████╗███████╗██╗     ███████╗██╗  ██╗ █████╗  ██████╗██╗  ██╗\n  ╚══██╔══╝██╔════╝██║     ██╔════╝██║  ██║██╔══██╗██╔════╝██║  ██║\n     ██║   █████╗  ██║     █████╗  ███████║███████║╚█████╗ ███████║\n     ██║   ██╔══╝  ██║     ██╔══╝  ██╔══██║██╔══██║ ╚═══██╗██╔══██║\n     ██║   ███████╗███████╗███████╗██║  ██║██║  ██║██████╔╝██║  ██║\n     ╚═╝   ╚══════╝╚═ {color.white}{v}{color.header} ╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝{color.clear}'
+text = f'{color.header}  ████████╗███████╗██╗     ███████╗██╗  ██╗ █████╗  ██████╗██╗  ██╗\n  ╚══██╔══╝██╔════╝██║     ██╔════╝██║  ██║██╔══██╗██╔════╝██║  ██║\n     ██║   █████╗  ██║     █████╗  ███████║███████║╚█████╗ ███████║\n     ██║   ██╔══╝  ██║     ██╔══╝  ██╔══██║██╔══██║ ╚═══██╗██╔══██║\n     ██║   ███████╗███████╗███████╗██║  ██║██║  ██║██████╔╝██║  ██║\n     ╚═╝   ╚══════╝╚═ {color.white}{v}{color.header} ══╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝{color.clear}'
 
 men = { 'A': '.-',     'B': '-...',   'C': '-.-.',
         'D': '-..',    'E': '.',      'F': '..-.',
